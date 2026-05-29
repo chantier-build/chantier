@@ -1,0 +1,30 @@
+# Reciprocal credits
+
+Chantier is a greenfield project, not a fork. It is, however, built on the shoulders of two MIT-licensed predecessors whose architectural traditions Chantier explicitly inherits and acknowledges. Without them, Chantier would not exist.
+
+## Get Shit Done (GSD) — state machine tradition
+
+- **Origin:** `gsd-build/get-shit-done` (archived after community-flagged governance incident, 2026-04-01)
+- **Active continuation:** [`open-gsd/get-shit-done-redux`](https://github.com/open-gsd/get-shit-done-redux), maintained by Lex Christopherson (`trek-e`) and contributors
+- **License:** MIT
+- **What Chantier inherits:** the `.planning/` filesystem skeleton (`PROJECT.md`, `ROADMAP.md`, `STATE.md`, per-phase plans and reviews), the project → milestone → phase hierarchy, the `discuss → plan → execute → verify → ship` six-step loop, the central `config.json` model.
+- **What Chantier diverges on:** zero-padded `N-MM-` filename conventions are demoted to readable hints (canonical identifiers live in YAML); skill bodies replace Claude-Code-native subagent declarations as the unit of execution; hook injection is forbidden as a load-bearing mechanism.
+
+## Superpowers — skill library tradition
+
+- **Origin:** [`obra/superpowers`](https://github.com/obra/superpowers), authored by Jesse Vincent
+- **Methodology post:** [`blog.fsck.com/2025/10/09/superpowers/`](https://blog.fsck.com/2025/10/09/superpowers/)
+- **License:** MIT
+- **What Chantier inherits:** the `SKILL.md` unit (Markdown body + YAML front-matter), TDD red/green discipline as a callable skill, between-task code review as a callable skill, worktree-based isolation, subagent dispatch, pressure-testing of skills against adversarial scenarios (Cialdini-derived), and the goal of cross-agent portability.
+- **What Chantier diverges on:** the discipline framework lives *in skill bodies and the dossier*, never in session-injected hooks (a direct response to the gap documented in [obra/superpowers#237](https://github.com/obra/superpowers/issues/237)); persistent state across sessions is a first-class concern, not deferred; skill extraction is integrated into the normal phase-close cycle, not a one-shot post-hoc mining job.
+
+## Inspirations beyond these two
+
+The following work informed our positioning and design decisions without being directly inherited from. They are noted here as honest acknowledgment:
+
+- The broader spec-driven development ecosystem (BMAD, Kiro, and adjacent frameworks) for clarifying what "spec-driven" means in 2026.
+- Pulumi's published comparisons of orchestration frameworks for AI coding agents.
+
+## Reciprocity
+
+If you build on Chantier, we ask only that you acknowledge us the way we acknowledge GSD and Superpowers here. Cite the project, link the relevant ADR if you diverge from it, and keep the MIT permission notice intact.

@@ -1,0 +1,36 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Node (we will likely host a TS/JS toolchain in core/)
+node_modules/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npmrc
+
+# Chantier runtime (per ADR 0001 — staging area for skill dossiers, never committed)
+.chantier/
+**/.chantier/
+
+# Local-only env files
+.env
+.env.local
+.env.*.local
+
+# Claude Code per-user harness settings (team-shared settings.json may be committed; *.local.json is personal)
+.claude/settings.local.json
+
+# Test/build outputs
+dist/
+build/
+coverage/
+*.tsbuildinfo
