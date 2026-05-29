@@ -1,7 +1,8 @@
 # ADR 0001 — The State / Skill Contract
 
-- **Status:** Proposed
-- **Date:** 2026-05-29
+- **Status:** Accepted
+- **Date proposed:** 2026-05-29
+- **Date accepted:** 2026-05-29
 - **Deciders:** Chantier founding contributors
 - **Supersedes:** —
 - **Superseded by:** —
@@ -240,5 +241,6 @@ A failed validation is a re-runnable error, not a destructive one. Outputs are k
 
 This ADR is the **point of no return** the brief identifies. Once accepted, every later ADR must justify any divergence from these surfaces. No code that resembles runtime should be written until a human has signed off.
 
-- [ ] Approved by: ___________________
-- [ ] Date: ___________________
+- [x] Approved by founding contributors in the bootstrap session, 2026-05-29.
+- [x] Specific decisions ratified: YAML task blocks in `PLAN.md`; mandatory `state_reads`/`state_writes`; dossier staging by the executor; `output.md` + `output.json` mandatory with `STATE.md` append-only; `core/bin/chantier` as POSIX core binary; filenames as hints with YAML as canonical; `adapters/<harness>/` as the sole harness-specific code.
+- Four questions deliberately deferred: skill versioning + lockfile, `STATE.md` compaction, `inputs_schema` strictness, skill-to-skill composition syntax.
