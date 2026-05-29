@@ -1,35 +1,107 @@
----
-project_id: chantier
-milestone: v0.1.0
-created: 2026-05-29
----
+# Roadmap: Chantier
 
-# Roadmap — v0.1.0
+> **Format note (temporary):** This roadmap follows GSD's `gsd-tools` parser format because Chantier uses GSD as its bootstrap planning harness until its own runtime exists (Phase 2). The arc is documented in [STATE.md](STATE.md) under the `bootstrap.harness.chosen` event. Once Phase 5 (dogfood-e2e) ships, this file will be migrated back to Chantier's native format per ADR 0001 — at which point GSD will no longer be invoked in Chantier's own workflows.
 
-## In milestone v0.1.0
+## Overview
 
-| # | Phase | Status | One-sentence summary |
-|---|---|---|---|
-| 1 | `01-foundation` | ✅ DONE | Architecture proposed and ratified, repo skeleton shipped, GitHub org created, ADR 0001 accepted. |
-| 2 | `02-runtime-core` | 🚧 NEXT | Implement `core/bin/chantier` POSIX-shell binary with `state append` and `validate-task`; write ADR 0002 specifying STATE.md format and CLI surface. |
-| 3 | `03-skill-library` | ⏳ PLANNED | Author four reference skills (`using-git-worktrees`, `test-driven-development`, `requesting-code-review`, `subagent-driven-development`) with PRESSURE.md each. |
-| 4 | `04-claude-code-adapter` | ⏳ PLANNED | Build `adapters/claude-code/` that stages dossiers and dispatches subagents per ADR 0001. |
-| 5 | `05-dogfood-e2e` | ⏳ PLANNED | Use Chantier-on-Chantier to plan one small feature, execute it end-to-end with one shipped skill, surface gaps, record as integration test. |
+Chantier v0.1.0 ships when a developer can scaffold a new project, plan a phase, execute one task with a shipped skill, verify it, and produce a `STATE.md` that records the events — all through a portable POSIX-shell binary that respects the contract from ADR 0001. The five phases below take us from a paper architecture (foundation, already done) to a working end-to-end loop that has eaten its own dogfood.
 
-## Post-v0.1.0 visibility (not commitment)
+## Phases
 
-| Phase | Target milestone | Why later |
-|---|---|---|
-| Second harness adapter (Codex CLI or Cursor) | v0.2.0 | Proves portability claim; not blocking for v0.1.0's utility. |
-| `extract-skills-from-phase` self-improvement | v0.3.0 | Adds complexity v0.1.0 should not gate on. |
-| `chantier.lock` skill version pinning | TBD | Deferred per ADR 0001; needs more skills to surface real pain. |
-| `STATE.md` compaction | TBD | Premature; needs a real long-running project to learn the model. |
+**Phase Numbering:**
+- Integer phases (1, 2, 3, 4, 5): planned milestone work
+- Decimal phases (e.g., 2.1): urgent insertions if they appear later, marked `INSERTED`
 
-## Coverage check (every requirement maps to at least one phase)
+- [x] **Phase 1: Foundation** - Architecture proposed and ratified, repo skeleton shipped, GitHub org created, ADR 0001 accepted.
+- [ ] **Phase 2: Runtime core** - Implement `core/bin/chantier` POSIX-shell binary with `state append` and `validate-task` commands; codify ADR 0002.
+- [ ] **Phase 3: Skill library** - Author four reference skills (`using-git-worktrees`, `test-driven-development`, `requesting-code-review`, `subagent-driven-development`) with PRESSURE.md each.
+- [ ] **Phase 4: Claude Code adapter** - Build `adapters/claude-code/` that stages dossiers and dispatches subagents per ADR 0001.
+- [ ] **Phase 5: Dogfood E2E** - Use Chantier-on-Chantier; plan one small feature, execute it end-to-end with one shipped skill, surface gaps, record as integration test.
 
-- `FR-001`, `FR-003`, `FR-004` → Phase 2 (binary commands).
-- `FR-002` → Phase 2 (the `new` command scaffolds `.planning/`).
-- `FR-005`, `FR-006`, `FR-009`, `FR-010` → Phase 3.
-- `FR-007` → already specified in ADR 0001 (Phase 1).
-- `FR-008` → Phase 4.
-- `NFR-001`–`NFR-006` → enforced throughout; verified in Phase 5 (dogfood E2E).
+## Phase Details
+
+### Phase 1: Foundation
+**Goal**: Establish the architectural foundation for Chantier — research the inheritance from GSD redux and Superpowers, define the state/skill contract (ADR 0001), and ship a repository skeleton under a community-governed GitHub org with collective MIT copyright. No runtime code.
+**Depends on**: Nothing (first phase)
+**Requirements**: [FR-007]
+**Success Criteria** (what must be TRUE):
+  1. ADR 0001 (state/skill contract) ratified, status Accepted, and published in `docs/adr/`.
+  2. `docs/research/inheritance-map.md` captures derivation from GSD redux and Superpowers, including issue #237 as load-bearing constraint.
+  3. Repository public at `github.com/chantier-build/chantier` under MIT with collective copyright (`Chantier Contributors`).
+  4. `.planning/` populated and dogfood-validated against ADR 0001 schemas.
+**Plans**: 1 plan (complete)
+
+Plans:
+- [x] 01-01: foundation-bootstrap — research + ADR 0001 + scaffold + repo publication + `.planning/` backfill
+
+### Phase 2: Runtime core
+**Goal**: Implement `core/bin/chantier` POSIX-shell binary with at minimum `state append` and `validate-task` commands, and publish ADR 0002 codifying the STATE.md format and front-matter JSON Schemas left open by ADR 0001.
+**Depends on**: Phase 1
+**Requirements**: [FR-001, FR-002, FR-003, FR-004]
+**Success Criteria** (what must be TRUE):
+  1. `core/bin/chantier` exists as a POSIX shell + `jq` executable, no harness-specific dependencies.
+  2. `chantier state append --event X --task Y --skill Z --summary "..."` appends exactly one event row to `STATE.md`.
+  3. `chantier validate-task <task>` exits non-zero on contract violations (writes outside `state_writes`, missing `output.md`, schema mismatch on `output.json`, missing acceptance section).
+  4. `chantier new <name>` scaffolds `.planning/` with empty PROJECT/REQUIREMENTS/ROADMAP/STATE/config files.
+  5. ADR 0002 published with status Accepted: STATE.md format finalized (Markdown table vs JSONL vs hybrid) and JSON Schemas published for PROJECT/REQUIREMENTS/ROADMAP/PLAN/SKILL front-matters.
+**Plans**: TBD
+
+Plans:
+- [ ] 02-01: TBD (produced by `/gsd-plan-phase 2`)
+
+### Phase 3: Skill library
+**Goal**: Author the first four reference skills, exercising ADR 0001's SKILL.md schema with real bodies, and confirm `chantier validate-task` accepts tasks that invoke them.
+**Depends on**: Phase 2
+**Requirements**: [FR-005, FR-006, FR-009, FR-010]
+**Success Criteria** (what must be TRUE):
+  1. Four skills shipped: `using-git-worktrees`, `test-driven-development`, `requesting-code-review`, `subagent-driven-development`.
+  2. Each skill ships `SKILL.md` with valid front-matter per ADR 0001 (`id`, `version`, `inputs_schema`, `state_reads`, `state_writes`, `outputs_schema`, `portable: true`, `harness_adapters`).
+  3. Each skill ships `PRESSURE.md` with at least two adversarial scenarios per Superpowers' tradition.
+  4. `chantier validate-task` accepts a task that invokes any of these skills.
+  5. No skill body contains harness-specific identifiers (enforced by `chantier validate-task` portability grep).
+**Plans**: TBD
+
+Plans:
+- [ ] 03-01: TBD (produced by `/gsd-plan-phase 3`)
+
+### Phase 4: Claude Code adapter
+**Goal**: Build the first harness adapter at `adapters/claude-code/` that can stage a dossier for a task and dispatch a Claude Code subagent to execute the named skill — without leaking any Claude Code identifier back into skill bodies.
+**Depends on**: Phase 3
+**Requirements**: [FR-008]
+**Success Criteria** (what must be TRUE):
+  1. `adapters/claude-code/run-task.sh` stages `.chantier/dossiers/<task>/` containing `inputs.yml`, `reads/`, `upstream/`, and `env.sh` per ADR 0001 surface 2.
+  2. The adapter dispatches a Claude Code subagent that reads the dossier and executes the named skill body.
+  3. One end-to-end task invocation works (any of the four skills from Phase 3, executed in a worktree).
+  4. The adapter is the only file in the repo containing the string `claude-code` outside of documentation — verified by grep.
+**Plans**: TBD
+
+Plans:
+- [ ] 04-01: TBD (produced by `/gsd-plan-phase 4`)
+
+### Phase 5: Dogfood E2E
+**Goal**: Use Chantier-on-Chantier — plan one small feature using Chantier's own commands, execute it using one shipped skill, verify, and record the run as an integration test in `tests/e2e/`. This phase is also the formal cutover point where Chantier stops depending on GSD's commands.
+**Depends on**: Phase 4
+**Requirements**: [NFR-001, NFR-002, NFR-003, NFR-004, NFR-005, NFR-006]
+**Success Criteria** (what must be TRUE):
+  1. `tests/e2e/` contains an integration test that runs the full new-project → plan → execute → verify loop using only Chantier-built tooling.
+  2. The test produces a populated `.planning/STATE.md` without any contract violations detected by `chantier validate-task`.
+  3. The test passes in CI without network access (except where a skill explicitly opts in).
+  4. NFR-001 through NFR-006 are independently verified (portability grep, dependency audit, append-only check, network audit, language audit, license audit).
+  5. `.planning/ROADMAP.md` is migrated from GSD format back to Chantier-native format per ADR 0001 as the final commit of this phase.
+**Plans**: TBD
+
+Plans:
+- [ ] 05-01: TBD (produced by `/gsd-plan-phase 5` — the last GSD-driven planning in Chantier's history)
+
+## Progress
+
+**Execution Order:**
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Foundation | 1/1 | Complete | 2026-05-29 |
+| 2. Runtime core | 0/TBD | Not started | - |
+| 3. Skill library | 0/TBD | Not started | - |
+| 4. Claude Code adapter | 0/TBD | Not started | - |
+| 5. Dogfood E2E | 0/TBD | Not started | - |

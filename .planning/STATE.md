@@ -22,3 +22,4 @@ format_note: |
 | 2026-05-29T17:50:00Z | repo.published | MAoDzi | Repo chantier-build/chantier pushed public; Discussions enabled, Wiki and Projects disabled | github.com/chantier-build/chantier |
 | 2026-05-29T18:00:00Z | phase.completed | MAoDzi | Phase 01-foundation marked complete after backfill into .planning/ | .planning/phases/01-foundation/SUMMARY.md |
 | 2026-05-29T18:00:00Z | phase.next.declared | MAoDzi | Phase 02-runtime-core declared as next; needs ADR 0002 and core/bin/chantier | .planning/ROADMAP.md |
+| 2026-05-29T18:30:00Z | bootstrap.harness.chosen | MAoDzi | Decision: use GSD as Chantier's planning/execution harness for phases 2-5 (Option A in pre-flight check); ROADMAP.md rewritten to GSD parser format to unblock /gsd-plan-phase. Cutover to Chantier's native commands happens at end of Phase 5 (dogfood-e2e), at which point ROADMAP.md migrates back to ADR 0001 format. | ROADMAP.md |
