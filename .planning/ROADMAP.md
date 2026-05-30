@@ -14,7 +14,7 @@ Chantier v0.1.0 ships when a developer can scaffold a new project, plan a phase,
 - Decimal phases (e.g., 2.1): urgent insertions if they appear later, marked `INSERTED`
 
 - [x] **Phase 1: Foundation** - Architecture proposed and ratified, repo skeleton shipped, GitHub org created, ADR 0001 accepted.
-- [ ] **Phase 2: Runtime core** - Implement `core/bin/chantier` POSIX-shell binary with `state append` and `validate-task` commands; codify ADR 0002.
+- [x] **Phase 2: Runtime core** - Implement `core/bin/chantier` POSIX-shell binary with `state append` and `validate-task` commands; codify ADR 0002.
 - [ ] **Phase 3: Skill library** - Author four reference skills (`using-git-worktrees`, `test-driven-development`, `requesting-code-review`, `subagent-driven-development`) with PRESSURE.md each.
 - [ ] **Phase 4: Claude Code adapter** - Build `adapters/claude-code/` that stages dossiers and dispatches subagents per ADR 0001.
 - [ ] **Phase 5: Dogfood E2E** - Use Chantier-on-Chantier; plan one small feature, execute it end-to-end with one shipped skill, surface gaps, record as integration test.
@@ -73,7 +73,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 02-06-PLAN.md — Author ADR 0002 (status Accepted, schemas inline, mkdir-mutex documented, ADR-0001 open questions re-flagged); one-shot migrate STATE.md to JSONL in dedicated commit; append phase.completed event via the binary
+- [x] 02-06-PLAN.md — Author ADR 0002 (status Accepted, schemas inline, mkdir-mutex documented, ADR-0001 open questions re-flagged); one-shot migrate STATE.md to JSONL in dedicated commit; append phase.completed event via the binary
 
 ### Phase 3: Skill library
 
@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/1 | Complete | 2026-05-29 |
-| 2. Runtime core | 5/6 | In progress | - |
+| 2. Runtime core | 6/6 | Complete | 2026-05-30 |
 | 3. Skill library | 0/TBD | Not started | - |
 | 4. Claude Code adapter | 0/TBD | Not started | - |
 | 5. Dogfood E2E | 0/TBD | Not started | - |
