@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: ready_to_plan
-last_updated: "2026-05-30T23:30:58Z"
+last_updated: "2026-05-30T23:41:06Z"
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 20
-  completed_plans: 18
-  percent: 90
+  completed_plans: 19
+  percent: 95
 ---
 
 {"ts":"2026-05-29T17:00:00Z","event":"bootstrap.session.started","actor":"MAoDzi","task":null,"skill":null,"summary":"Brief received, session plan proposed, all seven ADR sign-offs validated","refs":["brief"]}
@@ -52,3 +52,5 @@ progress:
 {"ts":"2026-05-30T23:30:58Z","event":"task.completed","actor":"MAoDzi","task":"t1","skill":"null","summary":"Plan 05-02 task t1 complete: ADR 0004 (Surface 3 propagation) authored in Proposed status, 8 canonical sections, 151 lines, English-only","refs":["docs/adr/0004-surface-3-propagation.md","commit b54a53d"]}
 {"ts":"2026-05-30T23:30:58Z","event":"task.completed","actor":"MAoDzi","task":"t2","skill":"null","summary":"Plan 05-02 task t2 complete: core/tests/nfr_audits.bats authored with 6 @tests; bats suite 74/0 -> 80/0; byte-identical _full to chantier:687","refs":["core/tests/nfr_audits.bats","commit 2962c24"]}
 {"ts":"2026-05-30T23:30:58Z","event":"plan.completed","actor":"MAoDzi","task":"null","skill":"null","summary":"Plan 05-02 complete: ADR 0004 (Proposed) + nfr_audits.bats (6 @tests); D-05/D-06/D-09 implemented; SC#4 promoted from claim to enforcement; bats 80/0","refs":[".planning/phases/05-dogfood-e2e/05-02-SUMMARY.md","commit b54a53d","commit 2962c24"]}
+{"ts":"2026-05-30T23:40:59Z","event":"task.completed","actor":"MAoDzi","task":"t1","skill":"test-driven-development","summary":"Plan 05-03 task t1 complete: tests/e2e/full_loop.bats authored with CHANTIER_CLAUDE_BIN default + CHANTIER_E2E_REAL_CLAUDE opt-in","refs":[".planning/phases/05-dogfood-e2e/05-03-PLAN.md","tests/e2e/full_loop.bats","commit 29f3d24"]}
+{"ts":"2026-05-30T23:41:06Z","event":"plan.completed","actor":"MAoDzi","task":null,"skill":null,"summary":"Plan 05-03 complete: tests/e2e/full_loop.bats Phase 5 dogfood E2E integration test; bats 80/0 -> 81/0; D-03 + D-04 implemented; SC#1, SC#2, SC#3 promoted from claim to enforcement; chantier-on-chantier proof shipped","refs":[".planning/phases/05-dogfood-e2e/05-03-SUMMARY.md","tests/e2e/full_loop.bats","commit 29f3d24"]}

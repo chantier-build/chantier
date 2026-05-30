@@ -156,7 +156,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 05-03-PLAN.md — tests/e2e/full_loop.bats — full new-project → plan → execute → verify integration test with CHANTIER_E2E_REAL_CLAUDE opt-in gate (D-03, D-04, SC#1, SC#2, SC#3)
+- [x] 05-03-PLAN.md — tests/e2e/full_loop.bats — full new-project → plan → execute → verify integration test with CHANTIER_E2E_REAL_CLAUDE opt-in gate (D-03, D-04, SC#1, SC#2, SC#3)
 
 **Wave 3** *(final commit; blocked on Wave 2)*
 
@@ -173,4 +173,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Runtime core | 6/6 | Complete | 2026-05-30 |
 | 3. Skill library | 6/6 | Complete | 2026-05-30 |
 | 4. Claude Code adapter | 3/3 | Complete | 2026-05-30 |
-| 5. Dogfood E2E | 2/4 | In progress | - |
+| 5. Dogfood E2E | 3/4 | In progress | - |
