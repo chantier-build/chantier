@@ -151,7 +151,7 @@ Plans:
 
 **Wave 1** *(parallel — no file overlap between 05-01 and 05-02)*
 
-- [ ] 05-01-PLAN.md — F3 fix in adapters/claude-code/run-task.sh (depends_on → upstream/<tN>/output.json staging) + in-tree regression core/tests/adapter_upstream_e2e.bats (TDD red→green; D-01, D-02)
+- [x] 05-01-PLAN.md — F3 fix in adapters/claude-code/run-task.sh (depends_on → upstream/<tN>/output.json staging) + in-tree regression core/tests/adapter_upstream_e2e.bats (TDD red→green; D-01, D-02)
 - [ ] 05-02-PLAN.md — ADR 0004 (Surface 3 propagation, Proposed) + core/tests/nfr_audits.bats (six @test blocks, one per NFR-001..NFR-006) (D-05, D-06, D-09)
 
 **Wave 2** *(blocked on Wave 1)*
@@ -173,4 +173,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Runtime core | 6/6 | Complete | 2026-05-30 |
 | 3. Skill library | 6/6 | Complete | 2026-05-30 |
 | 4. Claude Code adapter | 3/3 | Complete | 2026-05-30 |
-| 5. Dogfood E2E | 0/4 | Not started | - |
+| 5. Dogfood E2E | 1/4 | In progress | - |

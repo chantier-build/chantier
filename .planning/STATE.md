@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: ready_to_plan
-last_updated: "2026-05-30T22:51:06.528Z"
+last_updated: "2026-05-30T23:04:05.186Z"
 progress:
   total_phases: 5
   completed_phases: 3
@@ -46,3 +46,6 @@ progress:
 {"ts":"2026-05-30T19:20:35Z","event":"plan.completed","actor":"MAoDzi","task":"null","skill":"null","summary":"Plan 04-03 complete: adapter_claude_code_e2e.bats lands proving FR-008 end-to-end via CHANTIER_CLAUDE_BIN stub; Rule-1 Surface 3 propagation fix added to adapters/claude-code/run-task.sh; bats core/tests/ 73/0","refs":[".planning/phases/04-claude-code-adapter/04-03-SUMMARY.md","core/tests/adapter_claude_code_e2e.bats","adapters/claude-code/run-task.sh"]}
 {"ts":"2026-05-30T19:20:41Z","event":"phase.completed","actor":"MAoDzi","task":"null","skill":"null","summary":"Phase 04-claude-code-adapter complete: FR-008 satisfied; adapter ships at adapters/claude-code/run-task.sh; bats suite at 73/0; ROADMAP SC#1-4 all green; PROJECT.md v0.1.0 SC#4 met","refs":[".planning/phases/04-claude-code-adapter/04-SUMMARY.md","adapters/claude-code/run-task.sh","core/tests/adapter_claude_code_e2e.bats","core/tests/adapter_isolation.bats"]}
 {"ts":"2026-05-30T22:04:53Z","event":"phase.context.gathered","actor":"MAoDzi","task":null,"skill":null,"summary":"Phase 05-dogfood-e2e context captured: F3 (upstream/ symlinks) as dogfood feature via TDD; tests/e2e/full_loop.bats single-bats with CHANTIER_CLAUDE_BIN stub + CHANTIER_E2E_REAL_CLAUDE opt-in gate; core/tests/nfr_audits.bats consolidated 6-@test audit; ROADMAP minimal migration + cutover.completed event in final commit; ADR 0004 (Surface 3 propagation) authored Proposed. 11 Claude's Discretion items. Ready for /gsd-plan-phase 5 (last GSD-driven planning in Chantier's history).","refs":[".planning/phases/05-dogfood-e2e/05-CONTEXT.md",".planning/phases/05-dogfood-e2e/05-DISCUSSION-LOG.md"]}
+{"ts":"2026-05-30T23:16:53Z","event":"task.completed","actor":"MAoDzi","task":"t1","skill":"test-driven-development","summary":"Plan 05-01 task t1 complete: adapter_upstream_e2e.bats authored as failing F3 regression (RED step)","refs":[".planning/phases/05-dogfood-e2e/05-01-PLAN.md","core/tests/adapter_upstream_e2e.bats","commit d133386"]}
+{"ts":"2026-05-30T23:16:57Z","event":"task.completed","actor":"MAoDzi","task":"t2","skill":"test-driven-development","summary":"Plan 05-01 task t2 complete: run-task.sh patched with F3 fix loop + README updated (GREEN step); bats 74/0; shellcheck clean","refs":[".planning/phases/05-dogfood-e2e/05-01-PLAN.md","adapters/claude-code/run-task.sh","adapters/claude-code/README.md","commit ed6dfe6"]}
+{"ts":"2026-05-30T23:17:00Z","event":"plan.completed","actor":"MAoDzi","task":"null","skill":"null","summary":"Plan 05-01 complete: F3 dogfood fix shipped via TDD (test d133386 -> feat ed6dfe6); bats 73/0 -> 74/0; shellcheck clean; adapter_isolation + adapter_claude_code_e2e green; NFR-001/002/005 honored; closes Phase 4 SUMMARY finding F3","refs":[".planning/phases/05-dogfood-e2e/05-01-SUMMARY.md","core/tests/adapter_upstream_e2e.bats","adapters/claude-code/run-task.sh"]}
