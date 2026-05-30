@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: ready_to_plan
-last_updated: "2026-05-30T18:47:09.235Z"
+last_updated: "2026-05-30T19:01:36.294Z"
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 15
-  completed_plans: 13
+  completed_plans: 14
   percent: 40
 ---
 
@@ -42,3 +42,4 @@ progress:
 {"ts":"2026-05-30T17:34:10Z","event":"phase.context.gathered","actor":"MAoDzi","task":null,"skill":null,"summary":"Phase 04-claude-code-adapter context captured: claude -p headless dispatch with minimal inline prompt, task.started/completed/failed bracketing, exit matrix 0/1/2/3 + attempts/<n>/; operator pre-creates worktree, dossier at $WORKTREE/.chantier/dossiers/<task>/, env.sh belt-and-suspenders, dossier preserved on success; new adapter_isolation.bats with path-only exemption (claude-code + mcp__claude_ai_ allowed inside adapter); e2e exercises test-driven-development via adapter_claude_code_e2e.bats with CHANTIER_CLAUDE_BIN stub; CLI run-task.sh <task-id> symmetric with chantier validate-task. 10 Claude's Discretion items. Ready for /gsd-plan-phase 4.","refs":[".planning/phases/04-claude-code-adapter/04-CONTEXT.md",".planning/phases/04-claude-code-adapter/04-DISCUSSION-LOG.md"]}
 {"ts":"2026-05-30T18:15:46Z","event":"plan.completed","actor":"MAoDzi","task":null,"skill":null,"summary":"Phase 04 plans drafted: 3 plans (audit harness + adapter + e2e) in 2 waves; all 16 D-NN locked decisions covered; FR-008 in every plan; plan-checker 0 blockers / 2 warnings (housekeeping in VALIDATION.md + RESEARCH.md, resolved at source)","refs":[".planning/phases/04-claude-code-adapter/04-01-PLAN.md",".planning/phases/04-claude-code-adapter/04-02-PLAN.md",".planning/phases/04-claude-code-adapter/04-03-PLAN.md",".planning/phases/04-claude-code-adapter/04-RESEARCH.md",".planning/phases/04-claude-code-adapter/04-PATTERNS.md",".planning/phases/04-claude-code-adapter/04-VALIDATION.md"]}
 {"ts":"2026-05-30T18:47:39Z","event":"plan.completed","actor":"MAoDzi","task":null,"skill":null,"summary":"Plan 04-01 complete: core/tests/adapter_isolation.bats ships with byte-identical _full literal to chantier:687/:912; HARNESS_DENY_LIST_CHECK marker convention propagated to 3 pre-existing bats files; bats suite 72/0; Rule-1 auto-fix promoted path-only grep-v filter to per-file content filter mirroring chantier:913","refs":[".planning/phases/04-claude-code-adapter/04-01-SUMMARY.md","core/tests/adapter_isolation.bats","commit 284d8a8"]}
+{"ts":"2026-05-30T19:02:09Z","event":"plan.completed","actor":"MAoDzi","task":"null","skill":"null","summary":"Plan 04-02 complete: adapters/claude-code/run-task.sh (236 lines, POSIX sh, shellcheck clean) + README.md (108 lines, English) shipped; D-01..D-16 implemented; bats 72/0; adapter_isolation green under D-10 carve-out; RESEARCH A1/A2/A4/A5 resolved per recommendations","refs":[".planning/phases/04-claude-code-adapter/04-02-SUMMARY.md","adapters/claude-code/run-task.sh","adapters/claude-code/README.md","commit c5d7d21"]}
