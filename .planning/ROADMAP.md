@@ -1,7 +1,5 @@
 # Roadmap: Chantier
 
-> **Format note (temporary):** This roadmap follows GSD's `gsd-tools` parser format because Chantier uses GSD as its bootstrap planning harness until its own runtime exists (Phase 2). The arc is documented in [STATE.md](STATE.md) under the `bootstrap.harness.chosen` event. Once Phase 5 (dogfood-e2e) ships, this file will be migrated back to Chantier's native format per ADR 0001 — at which point GSD will no longer be invoked in Chantier's own workflows.
-
 ## Overview
 
 Chantier v0.1.0 ships when a developer can scaffold a new project, plan a phase, execute one task with a shipped skill, verify it, and produce a `STATE.md` that records the events — all through a portable POSIX-shell binary that respects the contract from ADR 0001. The five phases below take us from a paper architecture (foundation, already done) to a working end-to-end loop that has eaten its own dogfood.
@@ -17,7 +15,7 @@ Chantier v0.1.0 ships when a developer can scaffold a new project, plan a phase,
 - [x] **Phase 2: Runtime core** - Implement `core/bin/chantier` POSIX-shell binary with `state append` and `validate-task` commands; codify ADR 0002.
 - [x] **Phase 3: Skill library** - Author four reference skills (`using-git-worktrees`, `test-driven-development`, `requesting-code-review`, `subagent-driven-development`) with PRESSURE.md each.
 - [x] **Phase 4: Claude Code adapter** - Build `adapters/claude-code/` that stages dossiers and dispatches subagents per ADR 0001.
-- [ ] **Phase 5: Dogfood E2E** - Use Chantier-on-Chantier; plan one small feature, execute it end-to-end with one shipped skill, surface gaps, record as integration test.
+- [x] **Phase 5: Dogfood E2E** - Use Chantier-on-Chantier; plan one small feature, execute it end-to-end with one shipped skill, surface gaps, record as integration test.
 
 ## Phase Details
 
@@ -145,7 +143,7 @@ Plans:
   4. NFR-001 through NFR-006 are independently verified (portability grep, dependency audit, append-only check, network audit, language audit, license audit).
   5. `.planning/ROADMAP.md` is migrated from GSD format back to Chantier-native format per ADR 0001 as the final commit of this phase.
 
-**Plans**: 4 plans
+**Plans**: 4 plans (complete)
 
 Plans:
 
@@ -160,7 +158,7 @@ Plans:
 
 **Wave 3** *(final commit; blocked on Wave 2)*
 
-- [ ] 05-04-PLAN.md — Phase close: ROADMAP minimalist migration (D-07) + cutover.completed event (D-08) + phase.completed event (Discretion #10) + 05-SUMMARY.md
+- [x] 05-04-PLAN.md — Phase close: ROADMAP minimalist migration (D-07) + cutover.completed event (D-08) + phase.completed event (Discretion #10) + 05-SUMMARY.md
 
 ## Progress
 
@@ -173,4 +171,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Runtime core | 6/6 | Complete | 2026-05-30 |
 | 3. Skill library | 6/6 | Complete | 2026-05-30 |
 | 4. Claude Code adapter | 3/3 | Complete | 2026-05-30 |
-| 5. Dogfood E2E | 3/4 | In progress | - |
+| 5. Dogfood E2E | 4/4 | Complete | 2026-05-30 |
