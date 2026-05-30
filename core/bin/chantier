@@ -79,33 +79,47 @@ EOF
 }
 
 # ---------------------------------------------------------------------------
-# acquire_lock: mkdir-as-mutex with stale-PID detection (RESEARCH Pattern 2)
+# acquire_lock: mkdir-as-mutex with stale-PID detection and bounded retry
+# (RESEARCH Pattern 2). Retries up to LOCK_RETRIES times with LOCK_SLEEP
+# seconds between attempts to handle concurrent callers without corruption.
 # On success: arms EXIT/INT/TERM/HUP trap to release lock; returns 0.
-# On failure: prints contention message to stderr; returns 2.
+# On failure (all retries exhausted): prints contention message; returns 2.
 # MUST be called in the current shell — never in a pipeline (Pitfall 6).
 # ---------------------------------------------------------------------------
-acquire_lock() {
-    # First attempt
-    if mkdir "$LOCKDIR" 2>/dev/null; then
-        printf '%s\n' "$$" > "$PIDFILE"
-        trap 'rm -f "$PIDFILE"; rmdir "$LOCKDIR" 2>/dev/null' EXIT INT TERM HUP
-        return 0
-    fi
+LOCK_RETRIES=10
+LOCK_SLEEP=1
 
-    # Contention — check for stale lock
-    OTHERPID=""
-    if [ -f "$PIDFILE" ]; then
-        OTHERPID=$(cat "$PIDFILE" 2>/dev/null) || OTHERPID=""
-        if [ -n "$OTHERPID" ] && ! kill -0 "$OTHERPID" 2>/dev/null; then
-            # holder is gone — recover
-            rm -rf "$LOCKDIR"
-            if mkdir "$LOCKDIR" 2>/dev/null; then
-                printf '%s\n' "$$" > "$PIDFILE"
-                trap 'rm -f "$PIDFILE"; rmdir "$LOCKDIR" 2>/dev/null' EXIT INT TERM HUP
-                return 0
+acquire_lock() {
+    _retries=0
+    while [ "$_retries" -le "$LOCK_RETRIES" ]; do
+
+        # Attempt to create lock directory atomically
+        if mkdir "$LOCKDIR" 2>/dev/null; then
+            printf '%s\n' "$$" > "$PIDFILE"
+            trap 'rm -f "$PIDFILE"; rmdir "$LOCKDIR" 2>/dev/null' EXIT INT TERM HUP
+            return 0
+        fi
+
+        # Contention — check for stale lock (holder may have crashed)
+        OTHERPID=""
+        if [ -f "$PIDFILE" ]; then
+            OTHERPID=$(cat "$PIDFILE" 2>/dev/null) || OTHERPID=""
+            if [ -n "$OTHERPID" ] && ! kill -0 "$OTHERPID" 2>/dev/null; then
+                # Holder is gone — recover stale lock
+                rm -rf "$LOCKDIR"
+                if mkdir "$LOCKDIR" 2>/dev/null; then
+                    printf '%s\n' "$$" > "$PIDFILE"
+                    trap 'rm -f "$PIDFILE"; rmdir "$LOCKDIR" 2>/dev/null' EXIT INT TERM HUP
+                    return 0
+                fi
             fi
         fi
-    fi
+
+        _retries=$((_retries + 1))
+        if [ "$_retries" -le "$LOCK_RETRIES" ]; then
+            sleep "$LOCK_SLEEP"
+        fi
+    done
 
     printf 'chantier: state log busy (lock held by PID %s)\n' "${OTHERPID:-unknown}" >&2
     return 2
@@ -158,10 +172,11 @@ EOF
     [ -n "$SUMMARY" ] || { printf 'chantier: missing required -m\n' >&2; exit 3; }
 
     # D-09 event-shape regex: cheap shell-glob pre-check (case handles uppercase, leading-dot,
-    # trailing-dot, double-dot, and any non-[a-z0-9.] characters)
+    # trailing-dot, double-dot, and any non-[a-z0-9.] characters).
+    # A failed case-glob exits 1 with a message mentioning the shape regex (D-09).
     case "$EVENT" in
         *[!a-z0-9.]*|[!a-z]*|*..*|.*|*.)
-            printf 'chantier: event name does not match ^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+$\n' >&2
+            printf 'chantier: event name fails shape regex ^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+$\n' >&2
             exit 1
             ;;
     esac
