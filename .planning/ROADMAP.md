@@ -16,7 +16,7 @@ Chantier v0.1.0 ships when a developer can scaffold a new project, plan a phase,
 - [x] **Phase 1: Foundation** - Architecture proposed and ratified, repo skeleton shipped, GitHub org created, ADR 0001 accepted.
 - [x] **Phase 2: Runtime core** - Implement `core/bin/chantier` POSIX-shell binary with `state append` and `validate-task` commands; codify ADR 0002.
 - [x] **Phase 3: Skill library** - Author four reference skills (`using-git-worktrees`, `test-driven-development`, `requesting-code-review`, `subagent-driven-development`) with PRESSURE.md each.
-- [ ] **Phase 4: Claude Code adapter** - Build `adapters/claude-code/` that stages dossiers and dispatches subagents per ADR 0001.
+- [x] **Phase 4: Claude Code adapter** - Build `adapters/claude-code/` that stages dossiers and dispatches subagents per ADR 0001.
 - [ ] **Phase 5: Dogfood E2E** - Use Chantier-on-Chantier; plan one small feature, execute it end-to-end with one shipped skill, surface gaps, record as integration test.
 
 ## Phase Details
@@ -114,12 +114,12 @@ Plans:
 **Requirements**: [FR-008]
 **Success Criteria** (what must be TRUE):
 
-  1. `adapters/claude-code/run-task.sh` stages `.chantier/dossiers/<task>/` containing `inputs.yml`, `reads/`, `upstream/`, and `env.sh` per ADR 0001 surface 2.
-  2. The adapter dispatches a Claude Code subagent that reads the dossier and executes the named skill body.
-  3. One end-to-end task invocation works (any of the four skills from Phase 3, executed in a worktree).
-  4. The adapter is the only file in the repo containing the string `claude-code` outside of documentation — verified by grep.
+  1. [x] `adapters/claude-code/run-task.sh` stages `.chantier/dossiers/<task>/` containing `inputs.yml`, `reads/`, `upstream/`, and `env.sh` per ADR 0001 surface 2. (Evidence: `core/tests/adapter_claude_code_e2e.bats` lines 211-217 dossier-existence assertions; `bats core/tests/` 73/0)
+  2. [x] The adapter dispatches a Claude Code subagent that reads the dossier and executes the named skill body. (Evidence: same e2e test — exit 0 implies the stub cd'd to the dossier, sourced env.sh, exec'd skill/run.sh, and the skill wrote output.md+output.json with all five D-13 measurable signals)
+  3. [x] One end-to-end task invocation works (any of the four skills from Phase 3, executed in a worktree). (Evidence: e2e setup creates a real linked worktree via `git worktree add -q "$WORKTREE_DIR" -b test-branch`; the `test-driven-development` skill is dispatched and `chantier validate-task` exits 0)
+  4. [x] The adapter is the only file in the repo containing the string `claude-code` outside of documentation — verified by grep. (Evidence: `bats core/tests/adapter_isolation.bats` 1/0 with path-only D-10 carve-out for `adapters/claude-code/`; cross-tree audit byte-identical to `core/bin/chantier:687`/`:912`)
 
-**Plans**: 3 plans
+**Plans**: 3 plans (complete)
 
 Plans:
 
@@ -130,7 +130,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 04-03-PLAN.md — core/tests/adapter_claude_code_e2e.bats end-to-end test (D-13, D-14, D-15) + phase close (04-SUMMARY.md + ROADMAP + STATE.md phase.completed)
+- [x] 04-03-PLAN.md — core/tests/adapter_claude_code_e2e.bats end-to-end test (D-13, D-14, D-15) + phase close (04-SUMMARY.md + ROADMAP + STATE.md phase.completed)
 
 ### Phase 5: Dogfood E2E
 
@@ -161,5 +161,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation | 1/1 | Complete | 2026-05-29 |
 | 2. Runtime core | 6/6 | Complete | 2026-05-30 |
 | 3. Skill library | 6/6 | Complete | 2026-05-30 |
-| 4. Claude Code adapter | 2/3 | In Progress|  |
+| 4. Claude Code adapter | 3/3 | Complete | 2026-05-30 |
 | 5. Dogfood E2E | 0/TBD | Not started | - |
