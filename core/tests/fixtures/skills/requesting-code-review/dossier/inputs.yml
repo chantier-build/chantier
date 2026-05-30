@@ -1,0 +1,5 @@
+diff_base_ref: "HEAD"
+diff_head_ref: "HEAD"
+scope_paths:
+  - "core/"
+reviewer_focus: "(empty diff fixture -- verifies the run.sh empty-diff business case end-to-end)"
