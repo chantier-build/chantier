@@ -98,7 +98,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1; four parallel plans with no inter-plan file overlap)*
 
-- [ ] 03-02-PLAN.md — skill: using-git-worktrees (SKILL.md + PRESSURE.md + run.sh + fixture + e2e bats test)
+- [x] 03-02-PLAN.md — skill: using-git-worktrees (SKILL.md + PRESSURE.md + run.sh + fixture + e2e bats test)
 - [ ] 03-03-PLAN.md — skill: test-driven-development (SKILL.md + PRESSURE.md + run.sh + fixture + e2e bats test)
 - [ ] 03-04-PLAN.md — skill: requesting-code-review (SKILL.md + PRESSURE.md + run.sh + fixture + e2e bats test)
 - [ ] 03-05-PLAN.md — skill: subagent-driven-development (SKILL.md + PRESSURE.md + run.sh with `## Why no hooks` + fixture + e2e bats test)
