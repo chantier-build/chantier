@@ -270,10 +270,10 @@ validate_against_schema() {
             $s as $sc
             | . as $v
             | [
-                # type check
+                # type check (use postfix | not for POSIX jq 1.6 compat)
                 (if $sc.type then
-                    (if ($v|type) != $sc.type
-                        and not ($sc.type == "number" and ($v|type) == "number")
+                    (if (($v|type) != $sc.type
+                        and (($sc.type == "number" and ($v|type) == "number") | not))
                      then "\($path): expected type \($sc.type), got \($v|type)"
                      else empty end)
                  else empty end),
@@ -515,7 +515,9 @@ EOF
     fi
 
     # Determine repo root (the directory containing .planning/)
-    _vt_repo_root=$(cd "$(dirname "$_vt_plan_path")/../.." && pwd -P 2>/dev/null) || {
+    # PLAN.md lives at <repo>/.planning/phases/<phase>/PLAN.md
+    # dirname → <repo>/.planning/phases/<phase>  → ../../.. → <repo>
+    _vt_repo_root=$(cd "$(dirname "$_vt_plan_path")/../../.." && pwd -P 2>/dev/null) || {
         printf 'chantier: could not determine repo root\n' >&2
         exit 2
     }
@@ -534,7 +536,7 @@ EOF
                 n = split(buf, lines, "\n")
                 for (i=1; i<=n; i++) {
                     line = lines[i]
-                    if (line ~ /^state_writes:/) { collecting=1; next }
+                    if (line ~ /^state_writes:/) { collecting=1; continue }
                     if (collecting && line ~ /^[a-z]/) { collecting=0 }
                     if (collecting && line ~ /^[[:space:]]+-/) {
                         sub(/^[[:space:]]+-[[:space:]]*"?/, "", line)
