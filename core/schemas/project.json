@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://chantier.build/schemas/v0.1.0/project.json",
+  "title": "Chantier PROJECT.md frontmatter (v0.1.0 profile)",
+  "type": "object",
+  "required": ["project_id", "created", "license", "copyright", "status"],
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "created": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "license": {
+      "type": "string",
+      "enum": ["MIT"]
+    },
+    "copyright": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "foundation_complete", "shipped", "archived"]
+    },
+    "governance": {
+      "type": "string"
+    },
+    "primary_artifact": {
+      "type": "string"
+    },
+    "current_milestone": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}
