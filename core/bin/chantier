@@ -1,0 +1,333 @@
+#!/bin/sh
+# Copyright (c) 2026 Chantier Contributors
+# SPDX-License-Identifier: MIT
+#
+# chantier -- portable state/skill runtime (POSIX sh, no bashisms)
+# Single-file binary. No sourcing. No bashisms. Mkdir-lock for concurrency.
+
+set -eu
+IFS='
+'
+LC_ALL=C
+export LC_ALL
+
+# ---------------------------------------------------------------------------
+# Global constants
+# ---------------------------------------------------------------------------
+CHANTIER_VERSION="0.1.0"
+# shellcheck disable=SC2034
+STATE_FILE=".planning/STATE.md"
+LOCKDIR=".planning/.chantier.lock"
+# shellcheck disable=SC2034
+PIDFILE="${LOCKDIR}/PID"
+
+# SCHEMAS_DIR resolved relative to $0 (follow symlinks with readlink)
+SCHEMAS_DIR="$(dirname "$(readlink "$0" 2>/dev/null || printf '%s' "$0")")/../schemas"
+
+# Top-level flag state (toggled by --json-errors before subcommand dispatch)
+JSON_ERRORS=0
+
+# Newline literal for POSIX-safe multi-value accumulation (no arrays)
+# shellcheck disable=SC2034
+NL='
+'
+
+# ---------------------------------------------------------------------------
+# emit_error: print error to stderr; if JSON_ERRORS=1 emit JSON object
+# ---------------------------------------------------------------------------
+emit_error() {
+    msg="$1"
+    code="${2:-2}"
+    if [ "$JSON_ERRORS" -eq 1 ]; then
+        printf '{"error":"%s","code":%s}\n' "$msg" "$code" >&2
+    else
+        printf 'chantier: %s\n' "$msg" >&2
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# usage: print help text and exit 0
+# ---------------------------------------------------------------------------
+usage() {
+    cat <<'EOF'
+chantier -- portable state/skill runtime (v0.1.0)
+
+Usage:
+  chantier [--json-errors] <subcommand> [args]
+  chantier --help | -h
+  chantier --version
+  chantier --self-test
+
+Subcommands:
+  state append   Append a state event to STATE.md (plan 02-04)
+  state show     Display the state log (plan 02-04)
+  validate-task  Validate a task output against ADR 0001 gates (plan 02-05)
+  new            Scaffold a new Chantier project (plan 02-05)
+
+Flags:
+  --json-errors  Emit errors as {"error":"...","code":N} JSON to stderr
+  --version      Print version (0.1.0) and exit 0
+  --self-test    Run portability self-check and exit 0 if all green
+  --help, -h     Print this help text and exit 0
+
+Exit codes:
+  0  success
+  1  contract violation (validation gate failed)
+  2  runtime error (missing dependency, lock failure, write error)
+  3  usage error (unknown subcommand, missing required argument)
+EOF
+}
+
+# ---------------------------------------------------------------------------
+# Stub functions (real implementations in plans 02-04 and 02-05)
+# Each stub:
+#   --help as first arg  -> print short description, exit 0
+#   anything else        -> print "not yet implemented", exit 2
+# ---------------------------------------------------------------------------
+state_append() {
+    case "${1:-}" in
+        --help)
+            cat <<'EOF'
+chantier state append -- Append a state event to STATE.md
+
+Usage:
+  chantier state append -e EVENT -t TASK -s SKILL -m SUMMARY [-r REF ...]
+
+Required flags:
+  -e EVENT    dotted-namespace event name (e.g. task.completed)
+  -m SUMMARY  one-line human summary
+
+Optional flags:
+  -t TASK     task identifier (e.g. t1)
+  -s SKILL    skill identifier
+  -r REF      reference (repeatable)
+
+Exit codes: 0 success, 1 contract violation, 2 runtime error, 3 usage error
+EOF
+            ;;
+        *)
+            emit_error "state append not yet implemented (lands in plan 02-04)" 2
+            exit 2
+            ;;
+    esac
+}
+
+state_show() {
+    case "${1:-}" in
+        --help)
+            cat <<'EOF'
+chantier state show -- Display the state log in tabular form
+
+Usage:
+  chantier state show
+
+Reads .planning/STATE.md and renders JSONL rows as aligned columns.
+
+Exit codes: 0 success, 2 runtime error
+EOF
+            ;;
+        *)
+            emit_error "state show not yet implemented (lands in plan 02-04)" 2
+            exit 2
+            ;;
+    esac
+}
+
+validate_task() {
+    case "${1:-}" in
+        --help)
+            cat <<'EOF'
+chantier validate-task -- Validate a task output against ADR 0001 gates
+
+Usage:
+  chantier validate-task TASK_ID
+
+Runs all five ADR 0001 validation gates against the task's output files.
+TASK_ID is the task identifier (e.g. t1) in the current plan.
+
+Exit codes: 0 success, 1 contract violation, 3 usage error
+EOF
+            ;;
+        *)
+            emit_error "validate-task not yet implemented (lands in plan 02-05)" 2
+            exit 2
+            ;;
+    esac
+}
+
+new_project() {
+    case "${1:-}" in
+        --help)
+            cat <<'EOF'
+chantier new -- Scaffold a new Chantier project
+
+Usage:
+  chantier new NAME
+
+Creates a new project directory NAME with the standard Chantier scaffold:
+  NAME/.planning/PROJECT.md
+  NAME/.planning/REQUIREMENTS.md
+  NAME/.planning/ROADMAP.md
+  NAME/.planning/STATE.md
+  NAME/.planning/config.json
+
+Exit codes: 0 success, 2 runtime error, 3 usage error
+EOF
+            ;;
+        *)
+            emit_error "new not yet implemented (lands in plan 02-05)" 2
+            exit 2
+            ;;
+    esac
+}
+
+# ---------------------------------------------------------------------------
+# Helper stubs (real implementations in plans 02-04 and 02-05)
+# ---------------------------------------------------------------------------
+mkdir_lock_acquire() {
+    emit_error "mkdir_lock_acquire not yet implemented (lands in plan 02-04)" 2
+    exit 2
+}
+
+mkdir_lock_release() {
+    emit_error "mkdir_lock_release not yet implemented (lands in plan 02-04)" 2
+    exit 2
+}
+
+validate_against_schema() {
+    emit_error "validate_against_schema not yet implemented (lands in plan 02-05)" 2
+    exit 2
+}
+
+extract_frontmatter_as_json() {
+    emit_error "extract_frontmatter_as_json not yet implemented (lands in plan 02-05)" 2
+    exit 2
+}
+
+# ---------------------------------------------------------------------------
+# self_test: portability and integrity checks (real implementation, not a stub)
+# Revised per RESEARCH §Claude's Discretion review row 4 and 11:
+#   - mkdir-lock round-trip (portable, no system-specific locking tools required)
+#   - harness-deny-list grep and CRLF check added
+# ---------------------------------------------------------------------------
+self_test() {
+    fails=0
+
+    # check NAME CMD [args...]: run CMD; print ok/FAIL; increment fails counter
+    check() {
+        _name="$1"; shift
+        if "$@" 2>/dev/null; then
+            printf '  ok  %s\n' "$_name"
+        else
+            printf '  FAIL %s\n' "$_name"
+            fails=$((fails + 1))
+        fi
+    }
+
+    printf 'chantier --self-test\n'
+
+    # 1. jq present
+    check 'jq present' command -v jq
+
+    # 2. jq version >= 1.6
+    # shellcheck disable=SC2016
+    check 'jq version >= 1.6' sh -c \
+        'jq --version 2>/dev/null | awk -F"[-.]" "{exit !((\$2+0)>=1 && (\$3+0)>=6)}"'
+
+    # 3. mkdir-lock works (per RESEARCH Discretion review row 4, portable mkdir primitive)
+    # shellcheck disable=SC2016
+    check 'mkdir-lock works' sh -c \
+        'd=$(mktemp -d)/lock; mkdir "$d" && rmdir "$d"'
+
+    # 4. awk present
+    check 'awk present' command -v awk
+
+    # 5. date -u produces ISO-8601 UTC output
+    check 'date -u present' date -u +%Y-%m-%dT%H:%M:%SZ
+
+    # 6. Every schema parses as valid JSON (skip .gitkeep, require at least one .json)
+    _schema_count=0
+    for s in "$SCHEMAS_DIR"/*.json; do
+        [ -f "$s" ] || continue
+        _schema_count=$((_schema_count + 1))
+        check "schema parses: $(basename "$s")" jq empty "$s"
+    done
+    if [ "$_schema_count" -eq 0 ]; then
+        printf '  FAIL no schemas found in %s\n' "$SCHEMAS_DIR"
+        fails=$((fails + 1))
+    fi
+
+    # 7. Every subcommand answers --help with exit 0
+    for sub in 'state append' 'state show' 'validate-task' 'new'; do
+        check "--help works: chantier $sub" sh -c "'$0' $sub --help >/dev/null 2>&1"
+    done
+
+    # 8. No harness identifiers in own source (deny-list grep)
+    #    NFR-001 carve-out: skill.json enum uses harness names as metadata constraints,
+    #    not as invocations; that file is not the binary and is not checked here.
+    #    All lines containing harness identifiers are marked HARNESS_DENY_LIST_CHECK
+    #    so the self-test grep can exclude them with grep -v.
+    _deny_pat='mcp__|claude_ai_|@codebase|claude-code|cursor|codex-cli|copilot-cli|gemini-cli|opencode' # HARNESS_DENY_LIST_CHECK
+    if grep -v 'HARNESS_DENY_LIST_CHECK' "$0" | grep -qE "$_deny_pat"; then
+        printf '  FAIL %s\n' 'no harness identifiers in self'
+        fails=$((fails + 1))
+    else
+        printf '  ok  %s\n' 'no harness identifiers in self'
+    fi
+
+    # 9. No CRLF line endings in own source (Pitfall 3 detection layer)
+    check 'no CRLF in self' sh -c \
+        "! file '$0' | grep -q CRLF"
+
+    if [ "$fails" -eq 0 ]; then
+        printf '\nself-test: all green\n'
+        exit 0
+    else
+        printf '\n%d self-test failure(s)\n' "$fails" >&2
+        exit 2
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# Top-level --json-errors flag (parsed BEFORE subcommand dispatch)
+# This allows: chantier --json-errors state append ...
+# ---------------------------------------------------------------------------
+if [ "${1:-}" = "--json-errors" ]; then
+    JSON_ERRORS=1
+    shift
+fi
+
+# ---------------------------------------------------------------------------
+# Subcommand dispatch
+# ---------------------------------------------------------------------------
+case "${1:-}" in
+    state)
+        shift
+        case "${1:-}" in
+            append) shift; state_append "$@" ;;
+            show)   shift; state_show   "$@" ;;
+            *)      emit_error "unknown state subcommand: ${1:-}" 3; exit 3 ;;
+        esac
+        ;;
+    validate-task)
+        shift
+        validate_task "$@"
+        ;;
+    new)
+        shift
+        new_project "$@"
+        ;;
+    --self-test)
+        self_test
+        ;;
+    --version)
+        printf '%s\n' "$CHANTIER_VERSION"
+        ;;
+    --help|-h|"")
+        usage
+        ;;
+    *)
+        emit_error "unknown subcommand: $1" 3
+        exit 3
+        ;;
+esac
