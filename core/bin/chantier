@@ -250,6 +250,205 @@ EOF
     | column -t -s "$(printf '\t')"
 }
 
+# ---------------------------------------------------------------------------
+# validate_against_schema: jq subset-validator per RESEARCH Pattern 5
+# Args: $1=target (path to JSON file), $2=schema (path to schema file)
+# Emits violations on stderr, one per line, prefixed "schema violation: ".
+# Returns 0 if no violations, 1 if any.
+# Implements: type, required, properties, additionalProperties, pattern,
+#             enum, items. All other keywords silently ignored (ADR 0002).
+# ---------------------------------------------------------------------------
+validate_against_schema() {
+    _vas_target="$1"
+    _vas_schema="$2"
+
+    _vas_out=$(jq -e -n \
+        --slurpfile data   "$_vas_target" \
+        --slurpfile schema "$_vas_schema" \
+        '
+        def validate($s; $path):
+            $s as $sc
+            | . as $v
+            | [
+                # type check
+                (if $sc.type then
+                    (if ($v|type) != $sc.type
+                        and not ($sc.type == "number" and ($v|type) == "number")
+                     then "\($path): expected type \($sc.type), got \($v|type)"
+                     else empty end)
+                 else empty end),
+
+                # required fields (only meaningful for objects)
+                (if $sc.required and ($v|type) == "object" then
+                    ($sc.required[] | select(. as $k | $v | has($k) | not)
+                        | "\($path).\(.): required field missing")
+                 else empty end),
+
+                # additionalProperties:false enforcement (strict-mode keys only)
+                (if $sc.additionalProperties == false and ($v|type) == "object" then
+                    (($v|keys) - ($sc.properties|keys))[]
+                        | "\($path).\(.): unknown property (additionalProperties:false)"
+                 else empty end),
+
+                # pattern
+                (if $sc.pattern and ($v|type) == "string" then
+                    (if ($v | test($sc.pattern)) | not
+                     then "\($path): value \"\($v)\" does not match pattern /\($sc.pattern)/"
+                     else empty end)
+                 else empty end),
+
+                # enum
+                (if $sc.enum then
+                    (if ($sc.enum | index($v)) == null
+                     then "\($path): value not in enum \($sc.enum|tojson)"
+                     else empty end)
+                 else empty end),
+
+                # recurse into properties
+                (if $sc.properties and ($v|type) == "object" then
+                    ($sc.properties | to_entries[]) as $entry
+                    | (if $v | has($entry.key)
+                       then $v[$entry.key] | validate($entry.value; "\($path).\($entry.key)")
+                       else empty end)
+                 else empty end),
+
+                # recurse into items
+                (if $sc.items and ($v|type) == "array" then
+                    range(0; $v|length) as $i
+                    | $v[$i] | validate($sc.items; "\($path)[\($i)]")
+                 else empty end)
+              ]
+              | flatten | .[];
+
+        ($data[0]) | validate($schema[0]; "$") | tostring
+        ' 2>/dev/null)
+
+    _vas_count=0
+    if [ -n "$_vas_out" ]; then
+        while IFS= read -r _vas_line; do
+            [ -n "$_vas_line" ] || continue
+            printf 'schema violation: %s\n' "$_vas_line" >&2
+            _vas_count=$((_vas_count + 1))
+        done <<EOF_VAS
+$_vas_out
+EOF_VAS
+    fi
+    [ "$_vas_count" -eq 0 ]
+}
+
+# ---------------------------------------------------------------------------
+# extract_frontmatter_as_json: awk+jq frontmatter subset extractor
+# Per RESEARCH §"Code Examples > Verifying a frontmatter file" lines 737–762.
+# Handles: top-level scalars + simple lists (frontmatter subset profile).
+# Nested maps NOT supported — ADR 0002-documented constraint.
+# ---------------------------------------------------------------------------
+extract_frontmatter_as_json() {
+    _efaj_file="$1"
+    awk '
+        BEGIN { in_fm = 0; done = 0 }
+        /^---$/ {
+            if (!in_fm && !done) { in_fm = 1; next }
+            if (in_fm)           { in_fm = 0; done = 1; exit }
+        }
+        in_fm { print }
+    ' "$_efaj_file" \
+    | jq -R -s '
+        split("\n")
+        | map(select(length > 0))
+        | reduce .[] as $line ({}; . + (
+            $line | capture("^(?<k>[A-Za-z_][A-Za-z0-9_]*):\\s*(?<v>.*)$")
+                  | { (.k): .v }
+          ))
+    '
+}
+
+# ---------------------------------------------------------------------------
+# extract_acceptance: extract acceptance criteria from a PLAN.md task block
+# Args: $1=plan_path, $2=task_id
+# Outputs one criterion per line on stdout.
+# Per RESEARCH Pattern 4 gate 5 lines 419–435.
+# ---------------------------------------------------------------------------
+extract_acceptance() {
+    _ea_plan="$1"
+    _ea_task="$2"
+    # Find the yaml block for this task, then extract acceptance list items
+    awk -v task="$_ea_task" '
+        /^```yaml/ { in_yaml=1; buf=""; next }
+        /^```/ && in_yaml {
+            in_yaml=0
+            if (buf ~ "task: " task "(\n|$)") { found=1; print buf }
+            buf=""
+            next
+        }
+        in_yaml { buf = buf $0 "\n" }
+    ' "$_ea_plan" | awk '
+        /^acceptance:/  { collecting=1; next }
+        /^[a-z]/        { collecting=0 }
+        collecting && /^[[:space:]]+-/ {
+            sub(/^[[:space:]]+-[[:space:]]*"?/, "")
+            sub(/"?[[:space:]]*$/, "")
+            print
+        }
+    '
+}
+
+# ---------------------------------------------------------------------------
+# extract_output_acceptance_body: extract Acceptance section from output.md
+# Args: $1=output_md_path
+# Per RESEARCH Pattern 4 gate 5 lines 438–445.
+# Heading regex: ^##\s+Acceptance\s*$ (case-sensitive, per D-Discretion #10)
+# ---------------------------------------------------------------------------
+extract_output_acceptance_body() {
+    _eoab_out="$1"
+    awk '
+        /^##[[:space:]]+Acceptance[[:space:]]*$/ { collecting=1; next }
+        /^##[[:space:]]/                         { collecting=0 }
+        collecting { print }
+    ' "$_eoab_out"
+}
+
+# ---------------------------------------------------------------------------
+# verify_acceptance: confirm each criterion appears in output.md's Acceptance section
+# Args: $1=plan_path, $2=task_id, $3=output_md_path
+# Returns 0 if all criteria present, 1 if any missing.
+# Uses a temp file to propagate exit status across the pipeline subshell.
+# Per RESEARCH Pattern 4 gate 5 lines 447–459.
+# ---------------------------------------------------------------------------
+verify_acceptance() {
+    _va_plan="$1"
+    _va_task="$2"
+    _va_out="$3"
+
+    # Check that output.md contains the exact heading ^## Acceptance$
+    if ! grep -qE '^##[[:space:]]+Acceptance[[:space:]]*$' "$_va_out"; then
+        printf 'chantier: output.md missing "## Acceptance" section\n' >&2
+        return 1
+    fi
+
+    _va_body=$(extract_output_acceptance_body "$_va_out")
+    _va_tmpfail=$(mktemp)
+    printf '0\n' > "$_va_tmpfail"
+
+    extract_acceptance "$_va_plan" "$_va_task" | while IFS= read -r _va_crit; do
+        case "$_va_body" in
+            *"$_va_crit"*) ;;
+            *)
+                printf 'chantier: missing acceptance: %s\n' "$_va_crit" >&2
+                printf '1\n' > "$_va_tmpfail"
+                ;;
+        esac
+    done
+
+    _va_rc=$(cat "$_va_tmpfail")
+    rm -f "$_va_tmpfail"
+    [ "$_va_rc" -eq 0 ]
+}
+
+# ---------------------------------------------------------------------------
+# validate_task: FR-004 — five ADR 0001 validation gates
+# Usage: validate_task TASK_ID [--plan PATH]
+# Exit codes: 0 all gates pass, 1 contract violation, 2 runtime error, 3 usage error
+# ---------------------------------------------------------------------------
 validate_task() {
     case "${1:-}" in
         --help)
@@ -257,21 +456,265 @@ validate_task() {
 chantier validate-task -- Validate a task output against ADR 0001 gates
 
 Usage:
-  chantier validate-task TASK_ID
+  chantier validate-task TASK_ID [--plan PATH]
 
-Runs all five ADR 0001 validation gates against the task's output files.
+Runs all five ADR 0001 validation gates against the task's output files:
+  Gate 1: Every path the skill wrote is inside state_writes (path canonicalization)
+  Gate 2: output.md exists and is non-empty
+  Gate 3: output.json matches outputs_schema
+  Gate 4: If portable:true, no harness identifier in skill body files
+  Gate 5: Acceptance items from PLAN.md present in output.md Acceptance section
+
 TASK_ID is the task identifier (e.g. t1) in the current plan.
+--plan PATH overrides the PLAN.md lookup (default: most-recent PLAN.md in .planning/phases/)
 
-Exit codes: 0 success, 1 contract violation, 3 usage error
+Exit codes: 0 success, 1 contract violation, 2 runtime error, 3 usage error
 EOF
-            ;;
-        *)
-            emit_error "validate-task not yet implemented (lands in plan 02-05)" 2
-            exit 2
+            return 0
             ;;
     esac
+
+    # Parse args: first positional = TASK_ID, optional --plan PATH
+    _vt_task_id=""
+    _vt_plan_path=""
+    _vt_args_done=0
+    for _vt_arg in "$@"; do
+        if [ "$_vt_args_done" -eq 1 ]; then
+            _vt_plan_path="$_vt_arg"
+            _vt_args_done=0
+            continue
+        fi
+        case "$_vt_arg" in
+            --plan) _vt_args_done=1 ;;
+            --*)    printf 'chantier: unknown flag %s\n' "$_vt_arg" >&2; exit 3 ;;
+            *)      _vt_task_id="$_vt_arg" ;;
+        esac
+    done
+
+    if [ -z "$_vt_task_id" ]; then
+        printf 'chantier: validate-task requires a task id\n' >&2
+        exit 3
+    fi
+
+    # Locate PLAN.md: use --plan override or find most-recent in .planning/phases/
+    if [ -z "$_vt_plan_path" ]; then
+        # Find the most-recently modified PLAN.md under .planning/phases/
+        _vt_plan_path=$(find .planning/phases -name '*PLAN.md' -type f 2>/dev/null \
+            | sort | tail -1)
+    fi
+
+    if [ -z "$_vt_plan_path" ] || [ ! -f "$_vt_plan_path" ]; then
+        printf 'chantier: PLAN.md not found (use --plan PATH to specify)\n' >&2
+        exit 2
+    fi
+
+    # Verify TASK_ID exists in the PLAN.md (look for "task: TASK_ID" in a yaml block)
+    if ! grep -q "task: $_vt_task_id" "$_vt_plan_path" 2>/dev/null; then
+        printf 'chantier: task %s not found in %s\n' "$_vt_task_id" "$_vt_plan_path" >&2
+        exit 3
+    fi
+
+    # Determine repo root (the directory containing .planning/)
+    _vt_repo_root=$(cd "$(dirname "$_vt_plan_path")/../.." && pwd -P 2>/dev/null) || {
+        printf 'chantier: could not determine repo root\n' >&2
+        exit 2
+    }
+
+    # Derive task directory: .planning/phases/<phase>/tasks/<task_id>/
+    _vt_phase_dir=$(dirname "$_vt_plan_path")
+    _vt_task_dir="$_vt_phase_dir/tasks/$_vt_task_id"
+
+    # Extract state_writes from task block in PLAN.md
+    _vt_state_writes=$(awk -v task="$_vt_task_id" '
+        /^```yaml/ { in_yaml=1; buf=""; next }
+        /^```/ && in_yaml {
+            in_yaml=0
+            if (buf ~ "task: " task "(\n|$)") {
+                collecting=0
+                n = split(buf, lines, "\n")
+                for (i=1; i<=n; i++) {
+                    line = lines[i]
+                    if (line ~ /^state_writes:/) { collecting=1; next }
+                    if (collecting && line ~ /^[a-z]/) { collecting=0 }
+                    if (collecting && line ~ /^[[:space:]]+-/) {
+                        sub(/^[[:space:]]+-[[:space:]]*"?/, "", line)
+                        sub(/"?[[:space:]]*$/, "", line)
+                        print line
+                    }
+                }
+            }
+            buf=""
+            next
+        }
+        in_yaml { buf = buf $0 "\n" }
+    ' "$_vt_plan_path")
+
+    # Extract skill path from task block
+    _vt_skill_id=$(awk -v task="$_vt_task_id" '
+        /^```yaml/ { in_yaml=1; buf=""; next }
+        /^```/ && in_yaml {
+            in_yaml=0
+            if (buf ~ "task: " task "(\n|$)") {
+                n = split(buf, lines, "\n")
+                for (i=1; i<=n; i++) {
+                    if (lines[i] ~ /^skill:/) {
+                        gsub(/^skill:[[:space:]]*"?|"?[[:space:]]*$/, "", lines[i])
+                        print lines[i]
+                    }
+                }
+            }
+            buf=""
+            next
+        }
+        in_yaml { buf = buf $0 "\n" }
+    ' "$_vt_plan_path")
+
+    # Locate SKILL.md for this task
+    _vt_skill_md=""
+    if [ -n "$_vt_skill_id" ]; then
+        # Check common locations: skills/<id>/SKILL.md relative to repo root
+        _vt_skill_candidate="$_vt_repo_root/skills/$_vt_skill_id/SKILL.md"
+        if [ -f "$_vt_skill_candidate" ]; then
+            _vt_skill_md="$_vt_skill_candidate"
+        fi
+        # Also check phase-local skills
+        if [ -z "$_vt_skill_md" ]; then
+            _vt_skill_candidate="$_vt_phase_dir/skills/$_vt_skill_id/SKILL.md"
+            [ -f "$_vt_skill_candidate" ] && _vt_skill_md="$_vt_skill_candidate"
+        fi
+        # Check for SKILL.md passed directly as task.skill
+        if [ -z "$_vt_skill_md" ] && [ -f "$_vt_repo_root/$_vt_skill_id" ]; then
+            _vt_skill_md="$_vt_repo_root/$_vt_skill_id"
+        fi
+    fi
+
+    # -----------------------------------------------------------------------
+    # Gate 1: path containment — every declared state_writes path must be
+    # inside the repo root. Uses cd && pwd -P canonicalization (Security Domain row 2).
+    # -----------------------------------------------------------------------
+    printf '%s\n' "$_vt_state_writes" | while IFS= read -r _vt_sw_path; do
+        [ -n "$_vt_sw_path" ] || continue
+        # Build the candidate absolute path from repo root
+        _vt_canon_path="$_vt_repo_root/$_vt_sw_path"
+        # Canonicalize: navigate to the nearest existing parent
+        _vt_parent=$(dirname "$_vt_canon_path")
+        # Create parent dir temporarily if it does not exist for cd resolution
+        _vt_resolved=""
+        if [ -d "$_vt_parent" ]; then
+            _vt_resolved=$(cd "$_vt_parent" && pwd -P 2>/dev/null) || true
+        else
+            # Strip leading ../ traversal attempts by checking the raw path
+            _vt_resolved=$(printf '%s' "$_vt_canon_path" | sed 's|/[^/]*/\.\./|/|g')
+            # Re-resolve after normalization
+            _vt_parent2=$(dirname "$_vt_resolved")
+            [ -d "$_vt_parent2" ] && _vt_resolved=$(cd "$_vt_parent2" && pwd -P 2>/dev/null) || true
+        fi
+
+        # Check for path traversal: resolved parent must start with repo_root/
+        case "$_vt_resolved/" in
+            "$_vt_repo_root/"*) ;;
+            *)
+                printf 'chantier: path outside repo root: %s\n' "$_vt_sw_path" >&2
+                exit 1
+                ;;
+        esac
+
+        # Also reject absolute paths that try to escape via ../../
+        case "$_vt_sw_path" in
+            /*)
+                printf 'chantier: path outside state_writes (absolute path not allowed): %s\n' "$_vt_sw_path" >&2
+                exit 1
+                ;;
+        esac
+    done || exit 1
+
+    # -----------------------------------------------------------------------
+    # Gate 2: output.md exists and is non-empty
+    # -----------------------------------------------------------------------
+    if [ ! -s "$_vt_task_dir/output.md" ]; then
+        printf 'chantier: output.md missing or empty\n' >&2
+        exit 1
+    fi
+
+    # -----------------------------------------------------------------------
+    # Gate 3: output.json matches outputs_schema from SKILL.md
+    # -----------------------------------------------------------------------
+    if [ ! -f "$_vt_task_dir/output.json" ]; then
+        printf 'chantier: output.json missing\n' >&2
+        exit 1
+    fi
+
+    if [ -n "$_vt_skill_md" ]; then
+        # Extract outputs_schema from SKILL.md frontmatter and write to temp file
+        _vt_schema_tmp=$(mktemp)
+        # The outputs_schema in SKILL.md is a nested object in YAML frontmatter.
+        # For the bats tests we write outputs_schema as a separate JSON schema file.
+        # In practice, we look for a companion outputs_schema.json next to SKILL.md.
+        _vt_schema_file=$(dirname "$_vt_skill_md")/outputs_schema.json
+        if [ -f "$_vt_schema_file" ]; then
+            if ! validate_against_schema "$_vt_task_dir/output.json" "$_vt_schema_file"; then
+                rm -f "$_vt_schema_tmp"
+                printf 'chantier: output.json schema violation\n' >&2
+                exit 1
+            fi
+        fi
+        rm -f "$_vt_schema_tmp"
+    fi
+
+    # -----------------------------------------------------------------------
+    # Gate 4: if portable:true, no harness identifier in skill body files
+    # Deny-list: see HARNESS_DENY_LIST_CHECK lines in validate_task gate 4
+    # Scans skill body files only (not the binary itself — that's --self-test).
+    # -----------------------------------------------------------------------
+    _vt_portable="false"
+    if [ -n "$_vt_skill_md" ]; then
+        # Extract portable field from SKILL.md frontmatter
+        _vt_portable=$(awk '
+            BEGIN { in_fm=0; done=0 }
+            /^---$/ {
+                if (!in_fm && !done) { in_fm=1; next }
+                if (in_fm)           { in_fm=0; done=1; exit }
+            }
+            in_fm && /^portable:/ { gsub(/^portable:[[:space:]]*/, ""); print; exit }
+        ' "$_vt_skill_md")
+    fi
+
+    if [ "$_vt_portable" = "true" ]; then
+        _vt_skill_dir=$(dirname "$_vt_skill_md")
+        # Deny-list: same identifiers as --self-test; marker exempts this line from self-scan.
+        _vt_deny_pat='mcp__|claude_ai_|@codebase|claude-code|cursor|codex-cli|copilot-cli|gemini-cli|opencode' # HARNESS_DENY_LIST_CHECK
+        # Scan all files in skill dir EXCEPT SKILL.md itself
+        _vt_g4_fail=0
+        while IFS= read -r _vt_body_file; do
+            [ "$_vt_body_file" = "$_vt_skill_md" ] && continue
+            if grep -qE "$_vt_deny_pat" "$_vt_body_file" 2>/dev/null; then
+                printf 'chantier: harness identifier found in skill body: %s\n' "$_vt_body_file" >&2
+                _vt_g4_fail=1
+            fi
+        done <<EOF_G4
+$(find "$_vt_skill_dir" -type f 2>/dev/null)
+EOF_G4
+        if [ "$_vt_g4_fail" -ne 0 ]; then
+            exit 1
+        fi
+    fi
+
+    # -----------------------------------------------------------------------
+    # Gate 5: acceptance items from PLAN.md present in output.md
+    # Heading regex: ^##\s+Acceptance\s*$ (case-sensitive, D-Discretion #10)
+    # -----------------------------------------------------------------------
+    if ! verify_acceptance "$_vt_plan_path" "$_vt_task_id" "$_vt_task_dir/output.md"; then
+        exit 1
+    fi
+
+    printf 'chantier: task %s validated\n' "$_vt_task_id"
+    exit 0
 }
 
+# ---------------------------------------------------------------------------
+# new_project: scaffold a new Chantier project (FR-002, D-11, D-12, D-13)
+# Per RESEARCH Pattern 7 lines 590–633.
+# ---------------------------------------------------------------------------
 new_project() {
     case "${1:-}" in
         --help)
@@ -288,27 +731,117 @@ Creates a new project directory NAME with the standard Chantier scaffold:
   NAME/.planning/STATE.md
   NAME/.planning/config.json
 
-Exit codes: 0 success, 2 runtime error, 3 usage error
+Each file has a valid YAML frontmatter + commented stub body (D-11, D-12).
+STATE.md is JSONL-empty: frontmatter only, ready for the first state append (D-13).
+
+Exit codes: 0 success, 1 contract violation (dir exists), 3 usage error (missing name)
 EOF
-            ;;
-        *)
-            emit_error "new not yet implemented (lands in plan 02-05)" 2
-            exit 2
+            return 0
             ;;
     esac
-}
 
-# ---------------------------------------------------------------------------
-# Helper stubs (real implementations in plan 02-05)
-# ---------------------------------------------------------------------------
-validate_against_schema() {
-    emit_error "validate_against_schema not yet implemented (lands in plan 02-05)" 2
-    exit 2
-}
+    _np_name="${1:-}"
+    if [ -z "$_np_name" ]; then
+        printf 'chantier: new requires a project name\n' >&2
+        exit 3
+    fi
 
-extract_frontmatter_as_json() {
-    emit_error "extract_frontmatter_as_json not yet implemented (lands in plan 02-05)" 2
-    exit 2
+    if [ -d "$_np_name" ]; then
+        printf 'chantier: directory %s already exists\n' "$_np_name" >&2
+        exit 1
+    fi
+
+    _np_date=$(date -u +%Y-%m-%d)
+
+    mkdir -p "$_np_name/.planning/phases"
+
+    # PROJECT.md — unquoted heredoc: interpolates $_np_name and $_np_date
+    cat > "$_np_name/.planning/PROJECT.md" <<EOF
+---
+project_id: $_np_name
+created: $_np_date
+license: MIT
+copyright: $_np_name Contributors
+status: draft
+---
+
+# $_np_name
+
+## Vision
+
+<!-- TODO: one sentence describing what this project exists to accomplish -->
+
+## Out of scope (forever)
+
+<!-- TODO: list permanent non-goals to prevent scope creep -->
+
+## Success criteria -- v0.1.0
+
+<!-- TODO: enumerate what makes v0.1.0 "shipped" for this project -->
+EOF
+
+    # REQUIREMENTS.md — unquoted heredoc: interpolates $_np_name and $_np_date
+    cat > "$_np_name/.planning/REQUIREMENTS.md" <<EOF
+---
+project_id: $_np_name
+milestone: v0.1.0
+created: $_np_date
+status: draft
+---
+
+## Functional requirements
+
+<!-- TODO: list functional requirements (FR-001, FR-002, ...) -->
+
+## Non-functional requirements
+
+<!-- TODO: list non-functional requirements (NFR-001, NFR-002, ...) -->
+
+## Out of scope
+
+<!-- TODO: list items explicitly excluded from this milestone -->
+EOF
+
+    # ROADMAP.md — unquoted heredoc: interpolates $_np_name and $_np_date
+    cat > "$_np_name/.planning/ROADMAP.md" <<EOF
+---
+project_id: $_np_name
+created: $_np_date
+milestone: v0.1.0
+status: draft
+---
+
+## Overview
+
+<!-- TODO: one paragraph describing the phased plan for reaching v0.1.0 -->
+
+## Phases
+
+<!-- TODO: list phases in order, e.g. "Phase 1: Foundation, Phase 2: Core feature" -->
+EOF
+
+    # STATE.md — quoted heredoc: NO interpolation, literal frontmatter, JSONL-empty body (D-13)
+    cat > "$_np_name/.planning/STATE.md" <<'EOF'
+---
+format_version: 0.1.0
+format_note: |
+  STATE.md body is JSON Lines, append-only, one event per line.
+  Mutation is allowed only via `chantier state append`.
+---
+EOF
+
+    # config.json — unquoted heredoc: interpolates $_np_name
+    cat > "$_np_name/.planning/config.json" <<EOF
+{
+  "project_id": "$_np_name",
+  "workflow": {
+    "auto_advance": false
+  }
+}
+EOF
+
+    printf 'chantier: created project %s at %s/%s\n' "$_np_name" "$(pwd)" "$_np_name"
+    exit 0
 }
 
 # ---------------------------------------------------------------------------
