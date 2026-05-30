@@ -1,11 +1,17 @@
 ---
-project_id: chantier
-created: 2026-05-29
-format_version: 0.1.0
-format_note: |
-  STATE.md body is JSON Lines, append-only, one event per line.
-  Mutation is allowed only via `chantier state append`.
+gsd_state_version: 1.0
+milestone: v0.1.0
+milestone_name: milestone
+status: unknown
+last_updated: "2026-05-30T06:07:22.668Z"
+progress:
+  total_phases: 5
+  completed_phases: 1
+  total_plans: 6
+  completed_plans: 6
+  percent: 20
 ---
+
 {"ts":"2026-05-29T17:00:00Z","event":"bootstrap.session.started","actor":"MAoDzi","task":null,"skill":null,"summary":"Brief received, session plan proposed, all seven ADR sign-offs validated","refs":["brief"]}
 {"ts":"2026-05-29T17:15:00Z","event":"research.completed","actor":"MAoDzi","task":null,"skill":null,"summary":"Inheritance map written from GSD redux, Superpowers, and obra/superpowers#237 finding","refs":["docs/research/inheritance-map.md"]}
 {"ts":"2026-05-29T17:25:00Z","event":"adr.accepted","actor":"MAoDzi","task":null,"skill":null,"summary":"ADR 0001 (state/skill contract) accepted; 7 surface decisions ratified, 4 questions deferred","refs":["docs/adr/0001-state-skill-contract.md"]}
@@ -26,3 +32,4 @@ format_note: |
 {"ts":"2026-05-30T05:30:56Z","event":"task.completed","actor":"MAoDzi","task":"t1","skill":"test-skill","summary":"verification smoke test","refs":[]}
 {"ts":"2026-05-30T06:04:54Z","event":"adr.proposed","actor":"MAoDzi","task":null,"skill":null,"summary":"ADR 0003 (workflow skill design principles) proposed: 4 principles — intentional authoring, no semantic doublons, thin skill + smart LLM, explicit chaining via PLAN.md. Ratification deferred until after Phase 5 dogfood.","refs":["docs/adr/0003-workflow-skill-design-principles.md"]}
 {"ts":"2026-05-30T06:04:59Z","event":"strategy.sketched","actor":"MAoDzi","task":null,"skill":null,"summary":"Post-v0.1.0 strategic sketch authored: 2 skill families (domain/workflow), 5 parallel maturity chantiers, multi-version arc v0.2.0→v1.0.0, candidate 7-skill workflow set. Sketch only; supersedes nothing in ROADMAP.md.","refs":["docs/strategy/maturity-path.md","docs/adr/0003-workflow-skill-design-principles.md"]}
+{"ts":"2026-05-30T06:07:33Z","event":"phase.context.gathered","actor":"MAoDzi","task":null,"skill":null,"summary":"Phase 03-skill-library context captured: run.sh shape (uniform, real shell work, deterministic outputs, per-skill exit codes), subagent discipline (invariants + read-aloud, shared kernel + specifics, measurable proofs, explicit Why-no-hooks), PRESSURE format (structured spec, time-pressure + sunk-cost minimum, Disqualifier-Invariant 1:1, minimal front-matter, per-skill autonomy), harness_adapters (tested-only [claude-code], in-body portability claim, bats uniformity test, mechanical E2E extension criterion). Ready for /gsd-plan-phase 3.","refs":[".planning/phases/03-skill-library/03-CONTEXT.md"]}
