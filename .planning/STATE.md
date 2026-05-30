@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: ready_to_plan
-last_updated: "2026-05-30T18:15:19.175Z"
+last_updated: "2026-05-30T18:47:09.235Z"
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 15
-  completed_plans: 12
+  completed_plans: 13
   percent: 40
 ---
 
@@ -41,3 +41,4 @@ progress:
 {"ts":"2026-05-30T12:52:29Z","event":"phase.completed","actor":"MAoDzi","task":null,"skill":null,"summary":"Phase 03-skill-library complete: 4 reference skills shipped (using-git-worktrees, test-driven-development, requesting-code-review, subagent-driven-development); uniformity bats test green; 71 tests pass; gate-4 deny-list audit clean","refs":[".planning/phases/03-skill-library/03-SUMMARY.md","skills/using-git-worktrees/","skills/test-driven-development/","skills/requesting-code-review/","skills/subagent-driven-development/"]}
 {"ts":"2026-05-30T17:34:10Z","event":"phase.context.gathered","actor":"MAoDzi","task":null,"skill":null,"summary":"Phase 04-claude-code-adapter context captured: claude -p headless dispatch with minimal inline prompt, task.started/completed/failed bracketing, exit matrix 0/1/2/3 + attempts/<n>/; operator pre-creates worktree, dossier at $WORKTREE/.chantier/dossiers/<task>/, env.sh belt-and-suspenders, dossier preserved on success; new adapter_isolation.bats with path-only exemption (claude-code + mcp__claude_ai_ allowed inside adapter); e2e exercises test-driven-development via adapter_claude_code_e2e.bats with CHANTIER_CLAUDE_BIN stub; CLI run-task.sh <task-id> symmetric with chantier validate-task. 10 Claude's Discretion items. Ready for /gsd-plan-phase 4.","refs":[".planning/phases/04-claude-code-adapter/04-CONTEXT.md",".planning/phases/04-claude-code-adapter/04-DISCUSSION-LOG.md"]}
 {"ts":"2026-05-30T18:15:46Z","event":"plan.completed","actor":"MAoDzi","task":null,"skill":null,"summary":"Phase 04 plans drafted: 3 plans (audit harness + adapter + e2e) in 2 waves; all 16 D-NN locked decisions covered; FR-008 in every plan; plan-checker 0 blockers / 2 warnings (housekeeping in VALIDATION.md + RESEARCH.md, resolved at source)","refs":[".planning/phases/04-claude-code-adapter/04-01-PLAN.md",".planning/phases/04-claude-code-adapter/04-02-PLAN.md",".planning/phases/04-claude-code-adapter/04-03-PLAN.md",".planning/phases/04-claude-code-adapter/04-RESEARCH.md",".planning/phases/04-claude-code-adapter/04-PATTERNS.md",".planning/phases/04-claude-code-adapter/04-VALIDATION.md"]}
+{"ts":"2026-05-30T18:47:39Z","event":"plan.completed","actor":"MAoDzi","task":null,"skill":null,"summary":"Plan 04-01 complete: core/tests/adapter_isolation.bats ships with byte-identical _full literal to chantier:687/:912; HARNESS_DENY_LIST_CHECK marker convention propagated to 3 pre-existing bats files; bats suite 72/0; Rule-1 auto-fix promoted path-only grep-v filter to per-file content filter mirroring chantier:913","refs":[".planning/phases/04-claude-code-adapter/04-01-SUMMARY.md","core/tests/adapter_isolation.bats","commit 284d8a8"]}

@@ -125,7 +125,7 @@ Plans:
 
 **Wave 1** *(parallel — no file overlap between 04-01 and 04-02)*
 
-- [ ] 04-01-PLAN.md — core/tests/adapter_isolation.bats cross-tree NFR-001 audit harness (D-09–D-12)
+- [x] 04-01-PLAN.md — core/tests/adapter_isolation.bats cross-tree NFR-001 audit harness (D-09–D-12)
 - [ ] 04-02-PLAN.md — adapters/claude-code/run-task.sh adapter + README.md (D-01–D-08, D-15, D-16)
 
 **Wave 2** *(blocked on Wave 1)*
@@ -161,5 +161,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation | 1/1 | Complete | 2026-05-29 |
 | 2. Runtime core | 6/6 | Complete | 2026-05-30 |
 | 3. Skill library | 6/6 | Complete | 2026-05-30 |
-| 4. Claude Code adapter | 0/3 | Not started | - |
+| 4. Claude Code adapter | 1/3 | In Progress|  |
 | 5. Dogfood E2E | 0/TBD | Not started | - |
