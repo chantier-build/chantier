@@ -79,10 +79,42 @@ EOF
 }
 
 # ---------------------------------------------------------------------------
-# Stub functions (real implementations in plans 02-04 and 02-05)
-# Each stub:
-#   --help as first arg  -> print short description, exit 0
-#   anything else        -> print "not yet implemented", exit 2
+# acquire_lock: mkdir-as-mutex with stale-PID detection (RESEARCH Pattern 2)
+# On success: arms EXIT/INT/TERM/HUP trap to release lock; returns 0.
+# On failure: prints contention message to stderr; returns 2.
+# MUST be called in the current shell — never in a pipeline (Pitfall 6).
+# ---------------------------------------------------------------------------
+acquire_lock() {
+    # First attempt
+    if mkdir "$LOCKDIR" 2>/dev/null; then
+        printf '%s\n' "$$" > "$PIDFILE"
+        trap 'rm -f "$PIDFILE"; rmdir "$LOCKDIR" 2>/dev/null' EXIT INT TERM HUP
+        return 0
+    fi
+
+    # Contention — check for stale lock
+    OTHERPID=""
+    if [ -f "$PIDFILE" ]; then
+        OTHERPID=$(cat "$PIDFILE" 2>/dev/null) || OTHERPID=""
+        if [ -n "$OTHERPID" ] && ! kill -0 "$OTHERPID" 2>/dev/null; then
+            # holder is gone — recover
+            rm -rf "$LOCKDIR"
+            if mkdir "$LOCKDIR" 2>/dev/null; then
+                printf '%s\n' "$$" > "$PIDFILE"
+                trap 'rm -f "$PIDFILE"; rmdir "$LOCKDIR" 2>/dev/null' EXIT INT TERM HUP
+                return 0
+            fi
+        fi
+    fi
+
+    printf 'chantier: state log busy (lock held by PID %s)\n' "${OTHERPID:-unknown}" >&2
+    return 2
+}
+
+# ---------------------------------------------------------------------------
+# state_append: append one JSONL event line to STATE.md (FR-003)
+# Usage: state_append -e EVENT [-t TASK] [-s SKILL] -m SUMMARY [-r REF ...]
+# Exit codes: 0 success, 1 contract violation, 2 runtime error, 3 usage error
 # ---------------------------------------------------------------------------
 state_append() {
     case "${1:-}" in
@@ -104,14 +136,68 @@ Optional flags:
 
 Exit codes: 0 success, 1 contract violation, 2 runtime error, 3 usage error
 EOF
-            ;;
-        *)
-            emit_error "state append not yet implemented (lands in plan 02-04)" 2
-            exit 2
+            return 0
             ;;
     esac
+
+    EVENT="" TASK="" SKILL="" SUMMARY="" REFS=""
+    OPTIND=1
+    while getopts ":e:t:s:m:r:" opt; do
+        case "$opt" in
+            e) EVENT="$OPTARG" ;;
+            t) TASK="$OPTARG"  ;;
+            s) SKILL="$OPTARG" ;;
+            m) SUMMARY="$OPTARG" ;;
+            r) REFS="${REFS}${REFS:+$NL}${OPTARG}" ;;
+            \?) printf 'chantier: unknown flag -%s\n' "$OPTARG" >&2; exit 3 ;;
+            :)  printf 'chantier: flag -%s requires a value\n' "$OPTARG" >&2; exit 3 ;;
+        esac
+    done
+
+    [ -n "$EVENT" ]   || { printf 'chantier: missing required -e\n' >&2; exit 3; }
+    [ -n "$SUMMARY" ] || { printf 'chantier: missing required -m\n' >&2; exit 3; }
+
+    # D-09 event-shape regex: cheap shell-glob pre-check (case handles uppercase, leading-dot,
+    # trailing-dot, double-dot, and any non-[a-z0-9.] characters)
+    case "$EVENT" in
+        *[!a-z0-9.]*|[!a-z]*|*..*|.*|*.)
+            printf 'chantier: event name does not match ^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+$\n' >&2
+            exit 1
+            ;;
+    esac
+
+    # Authoritative regex via jq test() (PCRE-ish, handles all edge cases)
+    printf '%s\n' "$EVENT" | jq -R -e 'test("^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+$")' >/dev/null \
+        || { printf 'chantier: event name fails shape regex\n' >&2; exit 1; }
+
+    TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    ACTOR=$(git config user.name 2>/dev/null || printf 'unknown')
+
+    # Acquire lock in the current shell — NOT in a pipeline (Pitfall 6)
+    acquire_lock || exit $?
+
+    # Build the JSONL line via jq (all values flow through --arg, never eval'd — T-02-04-INJ)
+    # -c produces compact single-line JSON (correct JSONL format; tostring would double-encode)
+    LINE=$(
+        printf '%s\n' "$REFS" \
+        | jq -R -s -c --arg ts "$TS" --arg ev "$EVENT" --arg ac "$ACTOR" \
+                  --arg ta "${TASK:-}" --arg sk "${SKILL:-}" --arg sm "$SUMMARY" \
+            'split("\n") | map(select(length>0))
+             | { ts: $ts, event: $ev, actor: $ac,
+                 task: (if $ta=="" then null else $ta end),
+                 skill: (if $sk=="" then null else $sk end),
+                 summary: $sm, refs: . }'
+    )
+
+    printf '%s\n' "$LINE" >> "$STATE_FILE"
+    # Lock released automatically by the EXIT trap
 }
 
+# ---------------------------------------------------------------------------
+# state_show: render JSONL body of STATE.md as fixed-width columns (D-03)
+# Read-only — never acquires the lock.
+# Exit codes: 0 success, 2 runtime error
+# ---------------------------------------------------------------------------
 state_show() {
     case "${1:-}" in
         --help)
@@ -122,15 +208,31 @@ Usage:
   chantier state show
 
 Reads .planning/STATE.md and renders JSONL rows as aligned columns.
+Header: TS  EVENT  ACTOR  TASK  SKILL  SUMMARY  REFS
+Null fields are rendered as "-" (BSD column collapse mitigation).
 
 Exit codes: 0 success, 2 runtime error
 EOF
-            ;;
-        *)
-            emit_error "state show not yet implemented (lands in plan 02-04)" 2
-            exit 2
+            return 0
             ;;
     esac
+
+    if [ ! -f "$STATE_FILE" ]; then
+        printf 'chantier: STATE.md not found\n' >&2
+        exit 2
+    fi
+
+    # Strip YAML frontmatter (first two --- sentinels only), then render body lines.
+    # Null/empty → "-" before column -t to defeat BSD greedy-delimiter collapse (Pitfall 2).
+    awk 'BEGIN{infm=0} /^---$/ && NR==1 {infm=1; next} /^---$/ && infm {infm=0; next} !infm' "$STATE_FILE" \
+    | jq -r '
+        def or_dash: if . == null or . == "" then "-" else (.|tostring) end;
+        [.ts, .event, .actor, (.task|or_dash), (.skill|or_dash), .summary,
+         (.refs | if . == null or length == 0 then "-" else join(",") end)]
+        | @tsv
+      ' \
+    | (printf 'TS\tEVENT\tACTOR\tTASK\tSKILL\tSUMMARY\tREFS\n'; cat) \
+    | column -t -s "$(printf '\t')"
 }
 
 validate_task() {
@@ -182,18 +284,8 @@ EOF
 }
 
 # ---------------------------------------------------------------------------
-# Helper stubs (real implementations in plans 02-04 and 02-05)
+# Helper stubs (real implementations in plan 02-05)
 # ---------------------------------------------------------------------------
-mkdir_lock_acquire() {
-    emit_error "mkdir_lock_acquire not yet implemented (lands in plan 02-04)" 2
-    exit 2
-}
-
-mkdir_lock_release() {
-    emit_error "mkdir_lock_release not yet implemented (lands in plan 02-04)" 2
-    exit 2
-}
-
 validate_against_schema() {
     emit_error "validate_against_schema not yet implemented (lands in plan 02-05)" 2
     exit 2
