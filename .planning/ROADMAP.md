@@ -44,10 +44,15 @@ Plans:
   3. `chantier validate-task <task>` exits non-zero on contract violations (writes outside `state_writes`, missing `output.md`, schema mismatch on `output.json`, missing acceptance section).
   4. `chantier new <name>` scaffolds `.planning/` with empty PROJECT/REQUIREMENTS/ROADMAP/STATE/config files.
   5. ADR 0002 published with status Accepted: STATE.md format finalized (Markdown table vs JSONL vs hybrid) and JSON Schemas published for PROJECT/REQUIREMENTS/ROADMAP/PLAN/SKILL front-matters.
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 02-01: TBD (produced by `/gsd-plan-phase 2`)
+- [ ] 02-01-PLAN.md — Wave 0 infra: install bats-core + shellcheck, vendor bats-support + bats-assert submodules, .gitattributes LF guard, scaffold 5 bats files + 4 fixtures
+- [ ] 02-02-PLAN.md — Author the 5 JSON Schema draft-07 files under core/schemas/ (project, requirements, roadmap, plan, skill) per D-05/D-06/D-07
+- [ ] 02-03-PLAN.md — core/bin/chantier skeleton: shebang, prelude, dispatch, --help, --version, --self-test (REVISED mkdir-lock per RESEARCH), stubs; self_test.bats real assertions
+- [ ] 02-04-PLAN.md — state_append (FR-003) with mkdir-mutex concurrency primitive + state_show (D-03) with BSD-column collapse mitigation; bats coverage
+- [ ] 02-05-PLAN.md — validate_task (FR-004) with all 5 ADR-0001 gates + new_project (FR-002) with heredoc scaffolds; helpers validate_against_schema, extract_frontmatter_as_json
+- [ ] 02-06-PLAN.md — Author ADR 0002 (status Accepted, schemas inline, mkdir-mutex documented, ADR-0001 open questions re-flagged); one-shot migrate STATE.md to JSONL in dedicated commit; append phase.completed event via the binary
 
 ### Phase 3: Skill library
 **Goal**: Author the first four reference skills, exercising ADR 0001's SKILL.md schema with real bodies, and confirm `chantier validate-task` accepts tasks that invoke them.
@@ -101,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/1 | Complete | 2026-05-29 |
-| 2. Runtime core | 0/TBD | Not started | - |
+| 2. Runtime core | 0/6 | Not started | - |
 | 3. Skill library | 0/TBD | Not started | - |
 | 4. Claude Code adapter | 0/TBD | Not started | - |
 | 5. Dogfood E2E | 0/TBD | Not started | - |
