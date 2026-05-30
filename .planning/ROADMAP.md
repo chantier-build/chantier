@@ -119,11 +119,18 @@ Plans:
   3. One end-to-end task invocation works (any of the four skills from Phase 3, executed in a worktree).
   4. The adapter is the only file in the repo containing the string `claude-code` outside of documentation — verified by grep.
 
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 
-- [ ] 04-01: TBD (produced by `/gsd-plan-phase 4`)
+**Wave 1** *(parallel — no file overlap between 04-01 and 04-02)*
+
+- [ ] 04-01-PLAN.md — core/tests/adapter_isolation.bats cross-tree NFR-001 audit harness (D-09–D-12)
+- [ ] 04-02-PLAN.md — adapters/claude-code/run-task.sh adapter + README.md (D-01–D-08, D-15, D-16)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 04-03-PLAN.md — core/tests/adapter_claude_code_e2e.bats end-to-end test (D-13, D-14, D-15) + phase close (04-SUMMARY.md + ROADMAP + STATE.md phase.completed)
 
 ### Phase 5: Dogfood E2E
 
@@ -154,5 +161,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation | 1/1 | Complete | 2026-05-29 |
 | 2. Runtime core | 6/6 | Complete | 2026-05-30 |
 | 3. Skill library | 6/6 | Complete | 2026-05-30 |
-| 4. Claude Code adapter | 0/TBD | Not started | - |
+| 4. Claude Code adapter | 0/3 | Not started | - |
 | 5. Dogfood E2E | 0/TBD | Not started | - |
