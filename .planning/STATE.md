@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-05-30T12:31:28Z"
+last_updated: "2026-05-30T12:42:37Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 12
-  completed_plans: 8
-  percent: 27
+  completed_plans: 9
+  percent: 30
 ---
 
 {"ts":"2026-05-29T17:00:00Z","event":"bootstrap.session.started","actor":"MAoDzi","task":null,"skill":null,"summary":"Brief received, session plan proposed, all seven ADR sign-offs validated","refs":["brief"]}
@@ -37,3 +37,4 @@ progress:
 {"ts":"2026-05-30T12:10:08Z","event":"plan.completed","actor":"MAoDzi","task":null,"skill":"using-git-worktrees","summary":"Plan 03-02 complete: using-git-worktrees skill shipped end-to-end (SKILL.md + PRESSURE.md + run.sh + fixture + e2e bats test)","refs":[".planning/phases/03-skill-library/03-02-SUMMARY.md","skills/using-git-worktrees/","core/tests/skill_using_git_worktrees_e2e.bats"]}
 {"ts":"2026-05-30T12:21:32Z","event":"plan.completed","actor":"MAoDzi","task":"null","skill":"test-driven-development","summary":"Plan 03-03 complete: test-driven-development skill shipped end-to-end","refs":[".planning/phases/03-skill-library/03-03-SUMMARY.md"]}
 {"ts":"2026-05-30T12:31:28Z","event":"plan.completed","actor":"MAoDzi","task":"null","skill":"requesting-code-review","summary":"Plan 03-04 complete: requesting-code-review skill shipped end-to-end (empty-diff fixture case); skill_uniformity 3 PASS across 3 shipped skills; full bats suite 70/0","refs":[".planning/phases/03-skill-library/03-04-SUMMARY.md","skills/requesting-code-review/SKILL.md","skills/requesting-code-review/PRESSURE.md","skills/requesting-code-review/run.sh","core/tests/skill_requesting_code_review_e2e.bats","core/tests/fixtures/skills/requesting-code-review/dossier/inputs.yml"]}
+{"ts":"2026-05-30T12:42:37Z","event":"plan.completed","actor":"MAoDzi","task":"null","skill":"subagent-driven-development","summary":"Plan 03-05 complete: subagent-driven-development skill shipped end-to-end with ## Why no hooks section citing obra/superpowers#237; uniformity 3 PASS across all four Wave-2 skills; full bats suite 71/0","refs":[".planning/phases/03-skill-library/03-05-SUMMARY.md"]}
