@@ -6,7 +6,7 @@ copyright: Chantier Contributors
 governance: org chantier-build (multi-Owner target)
 primary_artifact: framework
 current_milestone: v0.1.0
-status: foundation_complete
+status: skill_library_complete
 ---
 
 # Chantier — Project Charter
@@ -36,11 +36,11 @@ A developer working on a multi-day or multi-week project with an AI coding agent
 
 Defined in detail in `.planning/REQUIREMENTS.md`. Summary:
 
-1. `core/bin/chantier` POSIX shell binary exists with `state append` and `validate-task` commands.
-2. `chantier new <name>` scaffolds `.planning/`.
-3. At least four reference skills shipped with PRESSURE.md.
-4. Claude Code harness adapter works end-to-end.
-5. Chantier's own development is managed by Chantier (`.planning/` populated and updated through phases).
+1. [x] `core/bin/chantier` POSIX shell binary exists with `state append` and `validate-task` commands. (Phase 2)
+2. [x] `chantier new <name>` scaffolds `.planning/`. (Phase 2)
+3. [x] At least four reference skills shipped with PRESSURE.md. (Phase 3 — using-git-worktrees, test-driven-development, requesting-code-review, subagent-driven-development)
+4. [ ] Claude Code harness adapter works end-to-end. (Phase 4)
+5. [ ] Chantier's own development is managed by Chantier (`.planning/` populated and updated through phases). (Phase 5 dogfood)
 
 ## Long-term thesis
 
