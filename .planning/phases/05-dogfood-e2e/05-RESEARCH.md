@@ -915,31 +915,31 @@ All factual claims in this research were tagged `[VERIFIED]` (probed via host co
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-### 1. Where does the F3 fix's in-tree bats regression test live?
+### 1. Where does the F3 fix's in-tree bats regression test live? (RESOLVED)
 
 **What we know:** Plan 05-01 ships the F3 fix AND a TDD-style failing-then-passing test (per D-02). The test belongs in `core/tests/` because it's a runtime regression test for the adapter.
 **What's unclear:** Should it be a NEW file (`core/tests/adapter_upstream_e2e.bats`) or an additional `@test` block in the existing `core/tests/adapter_claude_code_e2e.bats`?
-**Recommendation:** NEW file. The existing file is the FR-008 e2e proof; mixing the F3 regression test would couple two concerns. New file: `core/tests/adapter_upstream_e2e.bats`. Suite goes 73 → 74 here, then 74 → 80 after Plans 05-02 and 05-03.
+**RESOLVED:** NEW file. The existing file is the FR-008 e2e proof; mixing the F3 regression test would couple two concerns. New file: `core/tests/adapter_upstream_e2e.bats`. Suite goes 73 → 74 here, then 74 → 80 after Plans 05-02 and 05-03.
 
 **Re-correction of A7:** 73 (Phase 4 close) → 74 (Plan 05-01 in-tree regression test) → 80 (Plan 05-02 adds 6 NFR audits) → 81 (Plan 05-03 adds full_loop e2e). Final Phase 5 close: **81/0**.
 
-### 2. Should ADR 0004's "Surface 3 propagation" name be changed to match Chantier's evolving vocabulary?
+### 2. Should ADR 0004's "Surface 3 propagation" name be changed to match Chantier's evolving vocabulary? (RESOLVED)
 
 **What we know:** D-09 calls the contract "Surface 3 propagation." ADR 0001 §Surface 3 specifies the destination paths; the gap Phase 4 plan 03 filled is the dossier→TASK_DIR mechanism.
 **What's unclear:** Is "Surface 3 propagation" the right name, or "Dossier propagation" / "Output staging" / "Surface 2-to-3 bridge"?
-**Recommendation:** Keep "Surface 3 propagation" — it matches CONTEXT.md D-09 verbiage and the Phase 4 SUMMARY's section heading. Renaming risks introducing a third ADR vocabulary divergence.
+**RESOLVED:** Keep "Surface 3 propagation" — it matches CONTEXT.md D-09 verbiage and the Phase 4 SUMMARY's section heading. Renaming risks introducing a third ADR vocabulary divergence.
 
-### 3. Does the e2e test create the synthetic project name `chantier-e2e-dogfood` (Discretion item #9)?
+### 3. Does the e2e test create the synthetic project name `chantier-e2e-dogfood` (Discretion item #9)? (RESOLVED)
 
 **What we know:** Discretion item #9 reserves the choice.
-**Recommendation:** Yes, `chantier-e2e-dogfood`. It's descriptive, kebab-case (matches the project's `^[a-z][a-z0-9-]*$` ID pattern), and self-documenting in `bats` output. The alternative `chantier-test` is more generic but loses the "dogfood" semantic.
+**RESOLVED:** Yes, `chantier-e2e-dogfood`. It's descriptive, kebab-case (matches the project's `^[a-z][a-z0-9-]*$` ID pattern), and self-documenting in `bats` output. The alternative `chantier-test` is more generic but loses the "dogfood" semantic.
 
-### 4. Does `nfr_audits.bats` delegate NFR-001 to the existing `adapter_isolation.bats`, or duplicate?
+### 4. Does `nfr_audits.bats` delegate NFR-001 to the existing `adapter_isolation.bats`, or duplicate? (RESOLVED)
 
 **What we know:** D-06 says "may delegate to `adapter_isolation.bats`'s logic via a sourced helper, or duplicate the small grep."
-**Recommendation:** **Duplicate** the small grep inline in `nfr_audits.bats`. Rationale: bats does not support `source`-loading another test file's `@test` blocks cleanly; the `adapter_isolation.bats` @test stays as the canonical Phase 4 audit; the new `nfr_audits.bats` NFR-001 @test is the SC#4-explicit gate. Two tests, same pattern — minor redundancy, very clear contract.
+**RESOLVED:** **Duplicate** the small grep inline in `nfr_audits.bats`. Rationale: bats does not support `source`-loading another test file's `@test` blocks cleanly; the `adapter_isolation.bats` @test stays as the canonical Phase 4 audit; the new `nfr_audits.bats` NFR-001 @test is the SC#4-explicit gate. Two tests, same pattern — minor redundancy, very clear contract.
 
 ---
 

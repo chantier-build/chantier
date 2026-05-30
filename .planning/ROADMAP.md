@@ -145,11 +145,22 @@ Plans:
   4. NFR-001 through NFR-006 are independently verified (portability grep, dependency audit, append-only check, network audit, language audit, license audit).
   5. `.planning/ROADMAP.md` is migrated from GSD format back to Chantier-native format per ADR 0001 as the final commit of this phase.
 
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
 
-- [ ] 05-01: TBD (produced by `/gsd-plan-phase 5` — the last GSD-driven planning in Chantier's history)
+**Wave 1** *(parallel — no file overlap between 05-01 and 05-02)*
+
+- [ ] 05-01-PLAN.md — F3 fix in adapters/claude-code/run-task.sh (depends_on → upstream/<tN>/output.json staging) + in-tree regression core/tests/adapter_upstream_e2e.bats (TDD red→green; D-01, D-02)
+- [ ] 05-02-PLAN.md — ADR 0004 (Surface 3 propagation, Proposed) + core/tests/nfr_audits.bats (six @test blocks, one per NFR-001..NFR-006) (D-05, D-06, D-09)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 05-03-PLAN.md — tests/e2e/full_loop.bats — full new-project → plan → execute → verify integration test with CHANTIER_E2E_REAL_CLAUDE opt-in gate (D-03, D-04, SC#1, SC#2, SC#3)
+
+**Wave 3** *(final commit; blocked on Wave 2)*
+
+- [ ] 05-04-PLAN.md — Phase close: ROADMAP minimalist migration (D-07) + cutover.completed event (D-08) + phase.completed event (Discretion #10) + 05-SUMMARY.md
 
 ## Progress
 
@@ -162,4 +173,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Runtime core | 6/6 | Complete | 2026-05-30 |
 | 3. Skill library | 6/6 | Complete | 2026-05-30 |
 | 4. Claude Code adapter | 3/3 | Complete | 2026-05-30 |
-| 5. Dogfood E2E | 0/TBD | Not started | - |
+| 5. Dogfood E2E | 0/4 | Not started | - |
