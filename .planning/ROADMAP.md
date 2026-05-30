@@ -88,11 +88,24 @@ Plans:
   4. `chantier validate-task` accepts a task that invokes any of these skills.
   5. No skill body contains harness-specific identifiers (enforced by `chantier validate-task` portability grep).
 
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
 
-- [ ] 03-01: TBD (produced by `/gsd-plan-phase 3`)
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Wave 1 infra: core/tests/skill_uniformity.bats (3 @test blocks for D-16 / D-01 / FR-010, SKIP until skills land) + core/tests/fixtures/skills/ parent directory
+
+**Wave 2** *(blocked on Wave 1; four parallel plans with no inter-plan file overlap)*
+
+- [ ] 03-02-PLAN.md — skill: using-git-worktrees (SKILL.md + PRESSURE.md + run.sh + fixture + e2e bats test)
+- [ ] 03-03-PLAN.md — skill: test-driven-development (SKILL.md + PRESSURE.md + run.sh + fixture + e2e bats test)
+- [ ] 03-04-PLAN.md — skill: requesting-code-review (SKILL.md + PRESSURE.md + run.sh + fixture + e2e bats test)
+- [ ] 03-05-PLAN.md — skill: subagent-driven-development (SKILL.md + PRESSURE.md + run.sh with `## Why no hooks` + fixture + e2e bats test)
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 03-06-PLAN.md — Phase close: human-review checkpoint + 03-SUMMARY.md + ROADMAP update + STATE.md phase.completed append
 
 ### Phase 4: Claude Code adapter
 
@@ -140,6 +153,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/1 | Complete | 2026-05-29 |
 | 2. Runtime core | 6/6 | Complete | 2026-05-30 |
-| 3. Skill library | 0/TBD | Not started | - |
+| 3. Skill library | 0/6 | Not started | - |
 | 4. Claude Code adapter | 0/TBD | Not started | - |
 | 5. Dogfood E2E | 0/TBD | Not started | - |
