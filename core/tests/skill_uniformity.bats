@@ -19,13 +19,13 @@ setup() {
     cd "$BATS_TEST_DIRNAME/../.."
 }
 
-@test "every shipped skill declares harness_adapters: [claude-code]" {
+@test "every shipped skill declares harness_adapters: [claude-code]" { # HARNESS_DENY_LIST_CHECK
     _skill_dirs=$(find skills -mindepth 1 -maxdepth 1 -type d | sort)
     if [ -z "$_skill_dirs" ]; then
         skip "no skills shipped yet"
     fi
 
-    _reference="claude-code"
+    _reference="claude-code" # HARNESS_DENY_LIST_CHECK
     _all_arrays=""
     for _d in $_skill_dirs; do
         _skill_md="$_d/SKILL.md"

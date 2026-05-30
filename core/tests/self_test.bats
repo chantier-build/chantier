@@ -53,9 +53,8 @@ EOF
 # Test 5: no harness identifiers in binary outside deny-list marker line (NFR-001)
 #   Strips lines marked HARNESS_DENY_LIST_CHECK before grepping; count must be 0.
 @test "binary contains no harness identifiers outside deny-list marker" {
-    run sh -c "grep -v 'HARNESS_DENY_LIST_CHECK' \"$CHANTIER\" \
-        | grep -cE 'mcp__|claude_ai_|@codebase|claude-code|cursor|codex-cli|copilot-cli|gemini-cli|opencode' \
-        || true"
+    _deny='mcp__|claude_ai_|@codebase|claude-code|cursor|codex-cli|copilot-cli|gemini-cli|opencode' # HARNESS_DENY_LIST_CHECK
+    run sh -c "grep -v 'HARNESS_DENY_LIST_CHECK' \"$CHANTIER\" | grep -cE '$_deny' || true"
     assert_success
     assert_output "0"
 }

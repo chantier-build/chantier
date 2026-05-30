@@ -216,8 +216,7 @@ Directory is empty except for a .gitkeep placeholder'
     make_plan t1 "$VALID_SW" "$VALID_ACC"
     make_skill true
     # Inject a harness identifier into a skill body file (not SKILL.md itself)
-    printf 'This body references claude-code which is a harness\n' \
-        > "$TMPHOME/skills/test-skill/skill-body.sh"
+    printf 'This body references claude-code which is a harness\n' > "$TMPHOME/skills/test-skill/skill-body.sh" # HARNESS_DENY_LIST_CHECK
     make_task_dir t1 "$VALID_ACCEPTANCE_MD" '{}'
     run "$CHANTIER" validate-task t1 --plan "$TMPHOME/.planning/phases/test-phase/PLAN.md"
     assert_failure 1
@@ -231,8 +230,7 @@ Directory is empty except for a .gitkeep placeholder'
     make_plan t1 "$VALID_SW" "$VALID_ACC"
     make_skill false
     # Inject harness identifier into body file — should NOT trigger gate 4
-    printf 'This body references cursor adapter\n' \
-        > "$TMPHOME/skills/test-skill/skill-body.sh"
+    printf 'This body references cursor adapter\n' > "$TMPHOME/skills/test-skill/skill-body.sh" # HARNESS_DENY_LIST_CHECK
     make_task_dir t1 "$VALID_ACCEPTANCE_MD" '{}'
     run "$CHANTIER" validate-task t1 --plan "$TMPHOME/.planning/phases/test-phase/PLAN.md"
     # Gate 4 should NOT fire; other gates should pass
