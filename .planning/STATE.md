@@ -3,14 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: ready_to_plan
-last_updated: 2026-05-30T13:01:45.564Z
+last_updated: "2026-05-30T17:33:47.804Z"
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 12
-  completed_plans: 13
-  percent: 20
-stopped_at: Phase 03 complete (6/6) — ready to discuss Phase 4
+  completed_plans: 12
+  percent: 40
 ---
 
 {"ts":"2026-05-29T17:00:00Z","event":"bootstrap.session.started","actor":"MAoDzi","task":null,"skill":null,"summary":"Brief received, session plan proposed, all seven ADR sign-offs validated","refs":["brief"]}
@@ -40,3 +39,4 @@ stopped_at: Phase 03 complete (6/6) — ready to discuss Phase 4
 {"ts":"2026-05-30T12:31:28Z","event":"plan.completed","actor":"MAoDzi","task":"null","skill":"requesting-code-review","summary":"Plan 03-04 complete: requesting-code-review skill shipped end-to-end (empty-diff fixture case); skill_uniformity 3 PASS across 3 shipped skills; full bats suite 70/0","refs":[".planning/phases/03-skill-library/03-04-SUMMARY.md","skills/requesting-code-review/SKILL.md","skills/requesting-code-review/PRESSURE.md","skills/requesting-code-review/run.sh","core/tests/skill_requesting_code_review_e2e.bats","core/tests/fixtures/skills/requesting-code-review/dossier/inputs.yml"]}
 {"ts":"2026-05-30T12:42:37Z","event":"plan.completed","actor":"MAoDzi","task":"null","skill":"subagent-driven-development","summary":"Plan 03-05 complete: subagent-driven-development skill shipped end-to-end with ## Why no hooks section citing obra/superpowers#237; uniformity 3 PASS across all four Wave-2 skills; full bats suite 71/0","refs":[".planning/phases/03-skill-library/03-05-SUMMARY.md"]}
 {"ts":"2026-05-30T12:52:29Z","event":"phase.completed","actor":"MAoDzi","task":null,"skill":null,"summary":"Phase 03-skill-library complete: 4 reference skills shipped (using-git-worktrees, test-driven-development, requesting-code-review, subagent-driven-development); uniformity bats test green; 71 tests pass; gate-4 deny-list audit clean","refs":[".planning/phases/03-skill-library/03-SUMMARY.md","skills/using-git-worktrees/","skills/test-driven-development/","skills/requesting-code-review/","skills/subagent-driven-development/"]}
+{"ts":"2026-05-30T17:34:10Z","event":"phase.context.gathered","actor":"MAoDzi","task":null,"skill":null,"summary":"Phase 04-claude-code-adapter context captured: claude -p headless dispatch with minimal inline prompt, task.started/completed/failed bracketing, exit matrix 0/1/2/3 + attempts/<n>/; operator pre-creates worktree, dossier at $WORKTREE/.chantier/dossiers/<task>/, env.sh belt-and-suspenders, dossier preserved on success; new adapter_isolation.bats with path-only exemption (claude-code + mcp__claude_ai_ allowed inside adapter); e2e exercises test-driven-development via adapter_claude_code_e2e.bats with CHANTIER_CLAUDE_BIN stub; CLI run-task.sh <task-id> symmetric with chantier validate-task. 10 Claude's Discretion items. Ready for /gsd-plan-phase 4.","refs":[".planning/phases/04-claude-code-adapter/04-CONTEXT.md",".planning/phases/04-claude-code-adapter/04-DISCUSSION-LOG.md"]}
