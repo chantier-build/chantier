@@ -1,0 +1,4 @@
+target_file: "core/bin/chantier"
+test_framework: "bats"
+phase: "red"
+test_command: "false"
