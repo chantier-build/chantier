@@ -56,7 +56,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Wave 0 infra: install bats-core + shellcheck, vendor bats-support + bats-assert submodules, .gitattributes LF guard, scaffold 5 bats files + 4 fixtures
+- [x] 02-01-PLAN.md — Wave 0 infra: install bats-core + shellcheck, vendor bats-support + bats-assert submodules, .gitattributes LF guard, scaffold 5 bats files + 4 fixtures
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/1 | Complete | 2026-05-29 |
-| 2. Runtime core | 0/6 | Not started | - |
+| 2. Runtime core | 1/6 | In progress | - |
 | 3. Skill library | 0/TBD | Not started | - |
 | 4. Claude Code adapter | 0/TBD | Not started | - |
 | 5. Dogfood E2E | 0/TBD | Not started | - |
