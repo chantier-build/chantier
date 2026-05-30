@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: ready_to_plan
-last_updated: "2026-05-30T19:01:36.294Z"
+last_updated: "2026-05-30T22:04:22.282Z"
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 15
-  completed_plans: 14
-  percent: 40
+  completed_plans: 16
+  percent: 60
 ---
 
 {"ts":"2026-05-29T17:00:00Z","event":"bootstrap.session.started","actor":"MAoDzi","task":null,"skill":null,"summary":"Brief received, session plan proposed, all seven ADR sign-offs validated","refs":["brief"]}
@@ -45,3 +45,4 @@ progress:
 {"ts":"2026-05-30T19:02:09Z","event":"plan.completed","actor":"MAoDzi","task":"null","skill":"null","summary":"Plan 04-02 complete: adapters/claude-code/run-task.sh (236 lines, POSIX sh, shellcheck clean) + README.md (108 lines, English) shipped; D-01..D-16 implemented; bats 72/0; adapter_isolation green under D-10 carve-out; RESEARCH A1/A2/A4/A5 resolved per recommendations","refs":[".planning/phases/04-claude-code-adapter/04-02-SUMMARY.md","adapters/claude-code/run-task.sh","adapters/claude-code/README.md","commit c5d7d21"]}
 {"ts":"2026-05-30T19:20:35Z","event":"plan.completed","actor":"MAoDzi","task":"null","skill":"null","summary":"Plan 04-03 complete: adapter_claude_code_e2e.bats lands proving FR-008 end-to-end via CHANTIER_CLAUDE_BIN stub; Rule-1 Surface 3 propagation fix added to adapters/claude-code/run-task.sh; bats core/tests/ 73/0","refs":[".planning/phases/04-claude-code-adapter/04-03-SUMMARY.md","core/tests/adapter_claude_code_e2e.bats","adapters/claude-code/run-task.sh"]}
 {"ts":"2026-05-30T19:20:41Z","event":"phase.completed","actor":"MAoDzi","task":"null","skill":"null","summary":"Phase 04-claude-code-adapter complete: FR-008 satisfied; adapter ships at adapters/claude-code/run-task.sh; bats suite at 73/0; ROADMAP SC#1-4 all green; PROJECT.md v0.1.0 SC#4 met","refs":[".planning/phases/04-claude-code-adapter/04-SUMMARY.md","adapters/claude-code/run-task.sh","core/tests/adapter_claude_code_e2e.bats","core/tests/adapter_isolation.bats"]}
+{"ts":"2026-05-30T22:04:53Z","event":"phase.context.gathered","actor":"MAoDzi","task":null,"skill":null,"summary":"Phase 05-dogfood-e2e context captured: F3 (upstream/ symlinks) as dogfood feature via TDD; tests/e2e/full_loop.bats single-bats with CHANTIER_CLAUDE_BIN stub + CHANTIER_E2E_REAL_CLAUDE opt-in gate; core/tests/nfr_audits.bats consolidated 6-@test audit; ROADMAP minimal migration + cutover.completed event in final commit; ADR 0004 (Surface 3 propagation) authored Proposed. 11 Claude's Discretion items. Ready for /gsd-plan-phase 5 (last GSD-driven planning in Chantier's history).","refs":[".planning/phases/05-dogfood-e2e/05-CONTEXT.md",".planning/phases/05-dogfood-e2e/05-DISCUSSION-LOG.md"]}
