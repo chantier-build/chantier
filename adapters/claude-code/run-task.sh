@@ -109,6 +109,7 @@ fi
 
 INPUTS_BODY=$(extract_task_field "$TASK_ID" inputs       block-indent "$PLAN_PATH")
 STATE_READS=$(extract_task_field "$TASK_ID" state_reads  block-dash   "$PLAN_PATH")
+DEPENDS_ON=$(extract_task_field  "$TASK_ID" depends_on   block-dash   "$PLAN_PATH")
 
 # ---------------------------------------------------------------------------
 # Section 2 -- Dossier staging (ADR 0001 Surface 2 + D-06 + D-07)
@@ -140,6 +141,24 @@ printf '%s\n' "$STATE_READS" | while IFS= read -r _sr_path; do
     [ -n "$_sr_path" ] || continue
     [ -e "$WORKTREE/$_sr_path" ] || continue
     ln -s "$WORKTREE/$_sr_path" "$DOSSIER/reads/$(basename "$_sr_path")" 2>/dev/null || true
+done
+
+# F3 fix (Phase 5 D-01): stage upstream/<tN>/output.json for every tN in depends_on.
+# Per-file symlink shape (ADR 0001 Surface 2 line 134 example uses upstream/t0/output.json).
+# Symlink chosen over copy: tighter least-privilege; downstream reads only.
+# If upstream output is missing, exit 2 (invocation error) -- operator must dispatch tN first.
+# Empty depends_on is a no-op per Pitfall 4 (printf | while ... [ -n ... ] || continue).
+printf '%s\n' "$DEPENDS_ON" | while IFS= read -r _up_task; do
+    [ -n "$_up_task" ] || continue
+    _up_out="$WORKTREE/.planning/phases/$PHASE/tasks/$_up_task/output.json"
+    if [ ! -f "$_up_out" ]; then
+        printf 'run-task: depends_on=%s but %s not found; dispatch %s first\n' \
+            "$_up_task" "$_up_out" "$_up_task" >&2
+        exit 2
+    fi
+    mkdir -p "$DOSSIER/upstream/$_up_task"
+    ln -s "$_up_out" "$DOSSIER/upstream/$_up_task/output.json" 2>/dev/null || \
+        cp "$_up_out" "$DOSSIER/upstream/$_up_task/output.json"
 done
 
 # ---------------------------------------------------------------------------

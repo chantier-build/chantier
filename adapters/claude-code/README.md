@@ -79,12 +79,23 @@ After dispatch (success or failure), the dossier is preserved at
 inputs.yml                  -- extracted from PLAN.md inputs: block
 env.sh                      -- the three exports above
 reads/                      -- symlinks to declared state_reads paths
-upstream/                   -- reserved for depends_on outputs (Phase 5)
+upstream/<tN>/output.json   -- one entry per depends_on task ID
 skill/SKILL.md              -- copied from skills/<skill-id>/
 skill/PRESSURE.md           -- copied from skills/<skill-id>/
 skill/run.sh                -- copied from skills/<skill-id>/ (executable)
 subagent.transcript.log     -- real-claude path only
 ```
+
+When a task declares `depends_on: [tN, ...]` in its PLAN.md task block, the
+adapter populates `upstream/<tN>/output.json` as a symlink (with `cp`
+fallback when the filesystem rejects symlinks) to the prior task's
+`.planning/phases/<phase>/tasks/<tN>/output.json`. The depending task's
+skill body can then read upstream artifacts via `./upstream/<tN>/output.json`
+from inside the dossier. The operator dispatches upstream tasks first; if a
+`depends_on` target's `output.json` is not yet on disk, the adapter exits 2
+(invocation error) with a clear `depends_on=<tN> but <path> not found;
+dispatch <tN> first` message on stderr. v0.1 does not topologically sort
+the dispatch order in the adapter; future versions may add that affordance.
 
 Operator (or a future cleanup skill) decides when to purge. `git worktree
 remove` atomically discards the entire dossier tree.
