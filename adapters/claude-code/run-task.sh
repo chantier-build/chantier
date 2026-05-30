@@ -199,13 +199,30 @@ if [ "$CLAUDE_EXIT" -ne 0 ]; then
     exit 2
 fi
 
+# Surface 3 propagation: the skill ran from $DOSSIER (cwd was set by the
+# subagent / stub via `cd "$DOSSIER"`), so it wrote output.md, output.json,
+# and any skill-specific artifacts at the dossier root. ADR 0001 Surface 3
+# requires those outputs to land in state_writes -- i.e. under
+# .planning/phases/<phase>/tasks/<task>/. Copy every plain file at the
+# dossier root EXCEPT the inputs and adapter-owned artifacts (inputs.yml,
+# env.sh, subagent.transcript.log) and the subdirectories (reads/, upstream/,
+# skill/). D-08 dossier preservation is honored: this is a copy, not a move;
+# the original files remain in the dossier for forensic inspection.
+TASK_DIR="$WORKTREE/.planning/phases/$PHASE/tasks/$TASK_ID"
+mkdir -p "$TASK_DIR"
+for _out in "$DOSSIER"/*; do
+    [ -f "$_out" ] || continue
+    case "$(basename "$_out")" in
+        inputs.yml|env.sh|subagent.transcript.log) continue ;;
+    esac
+    cp "$_out" "$TASK_DIR/"
+done
+
 # Pitfall 2 bracket for validate-task. CWD already $WORKTREE.
 set +e
 chantier validate-task "$TASK_ID"
 VT_EXIT=$?
 set -e
-
-TASK_DIR="$WORKTREE/.planning/phases/$PHASE/tasks/$TASK_ID"
 
 if [ "$VT_EXIT" -ne 0 ]; then
     # Pitfall 3 + RESEARCH A4: glob-and-max + %02d zero-pad. Preserve prior attempts.
