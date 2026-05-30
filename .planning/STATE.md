@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v0.1.0
 milestone_name: milestone
 status: ready_to_plan
-last_updated: "2026-05-30T23:04:05.186Z"
+last_updated: "2026-05-30T23:30:58Z"
 progress:
   total_phases: 5
-  completed_phases: 3
-  total_plans: 19
-  completed_plans: 16
-  percent: 60
+  completed_phases: 4
+  total_plans: 20
+  completed_plans: 18
+  percent: 90
 ---
 
 {"ts":"2026-05-29T17:00:00Z","event":"bootstrap.session.started","actor":"MAoDzi","task":null,"skill":null,"summary":"Brief received, session plan proposed, all seven ADR sign-offs validated","refs":["brief"]}
@@ -49,3 +49,6 @@ progress:
 {"ts":"2026-05-30T23:16:53Z","event":"task.completed","actor":"MAoDzi","task":"t1","skill":"test-driven-development","summary":"Plan 05-01 task t1 complete: adapter_upstream_e2e.bats authored as failing F3 regression (RED step)","refs":[".planning/phases/05-dogfood-e2e/05-01-PLAN.md","core/tests/adapter_upstream_e2e.bats","commit d133386"]}
 {"ts":"2026-05-30T23:16:57Z","event":"task.completed","actor":"MAoDzi","task":"t2","skill":"test-driven-development","summary":"Plan 05-01 task t2 complete: run-task.sh patched with F3 fix loop + README updated (GREEN step); bats 74/0; shellcheck clean","refs":[".planning/phases/05-dogfood-e2e/05-01-PLAN.md","adapters/claude-code/run-task.sh","adapters/claude-code/README.md","commit ed6dfe6"]}
 {"ts":"2026-05-30T23:17:00Z","event":"plan.completed","actor":"MAoDzi","task":"null","skill":"null","summary":"Plan 05-01 complete: F3 dogfood fix shipped via TDD (test d133386 -> feat ed6dfe6); bats 73/0 -> 74/0; shellcheck clean; adapter_isolation + adapter_claude_code_e2e green; NFR-001/002/005 honored; closes Phase 4 SUMMARY finding F3","refs":[".planning/phases/05-dogfood-e2e/05-01-SUMMARY.md","core/tests/adapter_upstream_e2e.bats","adapters/claude-code/run-task.sh"]}
+{"ts":"2026-05-30T23:30:58Z","event":"task.completed","actor":"MAoDzi","task":"t1","skill":"null","summary":"Plan 05-02 task t1 complete: ADR 0004 (Surface 3 propagation) authored in Proposed status, 8 canonical sections, 151 lines, English-only","refs":["docs/adr/0004-surface-3-propagation.md","commit b54a53d"]}
+{"ts":"2026-05-30T23:30:58Z","event":"task.completed","actor":"MAoDzi","task":"t2","skill":"null","summary":"Plan 05-02 task t2 complete: core/tests/nfr_audits.bats authored with 6 @tests; bats suite 74/0 -> 80/0; byte-identical _full to chantier:687","refs":["core/tests/nfr_audits.bats","commit 2962c24"]}
+{"ts":"2026-05-30T23:30:58Z","event":"plan.completed","actor":"MAoDzi","task":"null","skill":"null","summary":"Plan 05-02 complete: ADR 0004 (Proposed) + nfr_audits.bats (6 @tests); D-05/D-06/D-09 implemented; SC#4 promoted from claim to enforcement; bats 80/0","refs":[".planning/phases/05-dogfood-e2e/05-02-SUMMARY.md","commit b54a53d","commit 2962c24"]}
