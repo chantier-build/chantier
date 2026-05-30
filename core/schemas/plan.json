@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://chantier.build/schemas/v0.1.0/plan.json",
+  "title": "Chantier PLAN.md frontmatter (v0.1.0 profile)",
+  "description": "Validates PLAN.md frontmatter only. Task-block YAML is validated by chantier validate-task via inline awk extraction; see ADR 0002 §Plan schema for the rationale.",
+  "type": "object",
+  "required": ["plan_id", "phase", "created", "declared_skills"],
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "pattern": "^[0-9]{2}-[a-z][a-z0-9-]*$"
+    },
+    "phase": {
+      "type": "string",
+      "pattern": "^[0-9]{2}(\\.[0-9]+)?-[a-z][a-z0-9-]*$"
+    },
+    "created": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "declared_skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "in_progress", "completed", "blocked"]
+    },
+    "date_started": {
+      "type": "string"
+    },
+    "date_completed": {
+      "type": "string"
+    },
+    "duration_estimated": {
+      "type": "string"
+    },
+    "duration_actual": {
+      "type": "string"
+    },
+    "note": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}
