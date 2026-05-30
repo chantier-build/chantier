@@ -15,7 +15,7 @@ Chantier v0.1.0 ships when a developer can scaffold a new project, plan a phase,
 
 - [x] **Phase 1: Foundation** - Architecture proposed and ratified, repo skeleton shipped, GitHub org created, ADR 0001 accepted.
 - [x] **Phase 2: Runtime core** - Implement `core/bin/chantier` POSIX-shell binary with `state append` and `validate-task` commands; codify ADR 0002.
-- [ ] **Phase 3: Skill library** - Author four reference skills (`using-git-worktrees`, `test-driven-development`, `requesting-code-review`, `subagent-driven-development`) with PRESSURE.md each.
+- [x] **Phase 3: Skill library** - Author four reference skills (`using-git-worktrees`, `test-driven-development`, `requesting-code-review`, `subagent-driven-development`) with PRESSURE.md each.
 - [ ] **Phase 4: Claude Code adapter** - Build `adapters/claude-code/` that stages dossiers and dispatches subagents per ADR 0001.
 - [ ] **Phase 5: Dogfood E2E** - Use Chantier-on-Chantier; plan one small feature, execute it end-to-end with one shipped skill, surface gaps, record as integration test.
 
@@ -82,13 +82,13 @@ Plans:
 **Requirements**: [FR-005, FR-006, FR-009, FR-010]
 **Success Criteria** (what must be TRUE):
 
-  1. Four skills shipped: `using-git-worktrees`, `test-driven-development`, `requesting-code-review`, `subagent-driven-development`.
-  2. Each skill ships `SKILL.md` with valid front-matter per ADR 0001 (`id`, `version`, `inputs_schema`, `state_reads`, `state_writes`, `outputs_schema`, `portable: true`, `harness_adapters`).
-  3. Each skill ships `PRESSURE.md` with at least two adversarial scenarios per Superpowers' tradition.
-  4. `chantier validate-task` accepts a task that invokes any of these skills.
-  5. No skill body contains harness-specific identifiers (enforced by `chantier validate-task` portability grep).
+  1. [x] Four skills shipped: `using-git-worktrees`, `test-driven-development`, `requesting-code-review`, `subagent-driven-development`. (Evidence: `skills/<name>/` directories exist; `core/tests/skill_uniformity.bats` @test 1)
+  2. [x] Each skill ships `SKILL.md` with valid front-matter per ADR 0001 (`id`, `version`, `inputs_schema`, `state_reads`, `state_writes`, `outputs_schema`, `portable: true`, `harness_adapters`). (Evidence: `chantier validate-task` gate 4 passes for each of the four `core/tests/skill_<name>_e2e.bats` tests)
+  3. [x] Each skill ships `PRESSURE.md` with at least two adversarial scenarios per Superpowers' tradition. (Evidence: `core/tests/skill_uniformity.bats` @test 2 asserts `grep -cE '^## Scenario [0-9]' >= 2`)
+  4. [x] `chantier validate-task` accepts a task that invokes any of these skills. (Evidence: 4 e2e bats tests, one per skill, each invoking `chantier validate-task t1` and asserting exit 0)
+  5. [x] No skill body contains harness-specific identifiers (enforced by `chantier validate-task` portability grep). (Evidence: gate 4 deny-list grep in `chantier validate-task`; verified explicitly by `grep -rE` audit in `.planning/phases/03-skill-library/03-SUMMARY.md` §Validation Results)
 
-**Plans**: 6 plans
+**Plans**: 6 plans (complete)
 
 Plans:
 
@@ -105,7 +105,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2)*
 
-- [ ] 03-06-PLAN.md — Phase close: human-review checkpoint + 03-SUMMARY.md + ROADMAP update + STATE.md phase.completed append
+- [x] 03-06-PLAN.md — Phase close: human-review checkpoint + 03-SUMMARY.md + ROADMAP update + STATE.md phase.completed append
 
 ### Phase 4: Claude Code adapter
 
@@ -153,6 +153,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/1 | Complete | 2026-05-29 |
 | 2. Runtime core | 6/6 | Complete | 2026-05-30 |
-| 3. Skill library | 5/6 | In Progress|  |
+| 3. Skill library | 6/6 | Complete | 2026-05-30 |
 | 4. Claude Code adapter | 0/TBD | Not started | - |
 | 5. Dogfood E2E | 0/TBD | Not started | - |
