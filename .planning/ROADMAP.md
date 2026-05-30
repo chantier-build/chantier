@@ -65,7 +65,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 02-04-PLAN.md — state_append (FR-003) with mkdir-mutex concurrency primitive + state_show (D-03) with BSD-column collapse mitigation; bats coverage
+- [x] 02-04-PLAN.md — state_append (FR-003) with mkdir-mutex concurrency primitive + state_show (D-03) with BSD-column collapse mitigation; bats coverage
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/1 | Complete | 2026-05-29 |
-| 2. Runtime core | 3/6 | In progress | - |
+| 2. Runtime core | 4/6 | In progress | - |
 | 3. Skill library | 0/TBD | Not started | - |
 | 4. Claude Code adapter | 0/TBD | Not started | - |
 | 5. Dogfood E2E | 0/TBD | Not started | - |
