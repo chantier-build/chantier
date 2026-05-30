@@ -1,0 +1,5 @@
+subtask_count: 2
+parent_brief: "Integrate the new billing endpoint: subtask 1 wires the database migration; subtask 2 wires the API route. Each subtask runs in isolation."
+subtask_focus:
+  - "database migration"
+  - "API route"
