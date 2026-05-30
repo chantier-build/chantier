@@ -69,7 +69,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 02-05-PLAN.md — validate_task (FR-004) with all 5 ADR-0001 gates + new_project (FR-002) with heredoc scaffolds; helpers validate_against_schema, extract_frontmatter_as_json
+- [x] 02-05-PLAN.md — validate_task (FR-004) with all 5 ADR-0001 gates + new_project (FR-002) with heredoc scaffolds; helpers validate_against_schema, extract_frontmatter_as_json
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/1 | Complete | 2026-05-29 |
-| 2. Runtime core | 4/6 | In progress | - |
+| 2. Runtime core | 5/6 | In progress | - |
 | 3. Skill library | 0/TBD | Not started | - |
 | 4. Claude Code adapter | 0/TBD | Not started | - |
 | 5. Dogfood E2E | 0/TBD | Not started | - |
